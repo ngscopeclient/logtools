@@ -31,6 +31,54 @@
 std::vector<std::unique_ptr<LogSink>> g_log_sinks;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Convenience function for parsing command-line arguments
+
+bool ParseLoggerArguments(
+	int& i,
+	int argc,
+	char* argv[],
+	LogSink::Severity& console_verbosity)
+{
+	string s(argv[i]);
+	
+	if(s == "-q" || s == "--quiet")
+	{
+		if(console_verbosity == LogSink::DEBUG)
+			console_verbosity = LogSink::VERBOSE;
+		else if(console_verbosity == LogSink::VERBOSE)
+			console_verbosity = LogSink::NOTICE;
+		else if(console_verbosity == LogSink::NOTICE)
+			console_verbosity = LogSink::WARNING;
+		else if(console_verbosity == LogSink::WARNING)
+			console_verbosity = LogSink::ERROR;
+	}
+	else if(s == "--verbose")
+		console_verbosity = LogSink::VERBOSE;
+	else if(s == "--debug")
+		console_verbosity = LogSink::DEBUG;
+	else if(s == "-l" || s == "--logfile" ||
+			s == "-L" || s == "--logfile-lines")
+	{
+		bool line_buffered = (s == "-L" || s == "--logfile-lines");
+		if(i+1 < argc) {
+			FILE *log = fopen(argv[++i], "wt");
+			g_log_sinks.emplace_back(new FILELogSink(log, line_buffered));
+		}
+		else
+		{
+			printf("%s requires an argument\n", s.c_str());
+		}
+	}
+	
+	//Unrecognized argument
+	else
+		return false;
+		
+	//We parsed this arg, caller should ignore it
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience functions that log into all configured sinks
 
 void LogFatal(const char *format, ...)

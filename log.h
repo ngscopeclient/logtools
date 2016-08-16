@@ -87,6 +87,16 @@ protected:
 
 extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
 
+/**
+	@brief Helper function for parsing arguments that use common syntax
+ */
+bool ParseLoggerArguments(
+	int& i,
+	int argc,
+	char* argv[],
+	LogSink::Severity& console_verbosity);
+	
+
 #ifdef __GNUC__
 #define ATTR_FORMAT(n, m) __attribute__((__format__ (__printf__, n, m)))
 #define ATTR_NORETURN     __attribute__((noreturn))
