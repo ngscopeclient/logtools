@@ -28,7 +28,9 @@
 #include <cstdlib>
 #include <string>
 
-std::vector<std::unique_ptr<LogSink>> g_log_sinks;
+using namespace std;
+
+vector<unique_ptr<LogSink>> g_log_sinks;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience function for parsing command-line arguments
