@@ -1,27 +1,20 @@
-/************************************************************************************************************************
- * Copyright (C) 2016 Andrew Zonenberg and contributors                                                                 *
- *                                                                                                                      *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the     *
- * following conditions are met:                                                                                        *
- *                                                                                                                      *
- *    * Redistributions of source code must retain the above copyright notice, this list of conditions, and the         *
- *      following disclaimer.                                                                                           *
- *                                                                                                                      *
- *    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the       *
- *      following disclaimer in the documentation and/or other materials provided with the distribution.                *
- *                                                                                                                      *
- *    * Neither the name of the author nor the names of any contributors may be used to endorse or promote products     *
- *      derived from this software without specific prior written permission.                                           *
- *                                                                                                                      *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED   *
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL *
- * THE AUTHORS BE HELD LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES        *
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR       *
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT *
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
- * POSSIBILITY OF SUCH DAMAGE.                                                                                          *
- *                                                                                                                      *
- ************************************************************************************************************************/
+/***********************************************************************************************************************
+ * Copyright (C) 2016 Andrew Zonenberg and contributors                                                                *
+ *                                                                                                                     *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General   *
+ * Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) *
+ * any later version.                                                                                                  *
+ *                                                                                                                     *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied  *
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for     *
+ * more details.                                                                                                       *
+ *                                                                                                                     *
+ * You should have received a copy of the GNU Lesser General Public License along with this program; if not, you may   *
+ * find one here:                                                                                                      *
+ * https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt                                                              *
+ * or you may search the http://www.gnu.org website for the version 2.1 license, or you may write to the Free Software *
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA                                      *
+ **********************************************************************************************************************/
 
 #ifndef log_h
 #define log_h
@@ -30,22 +23,25 @@
 #include <vector>
 
 /**
+	@brief The message severity
+ */
+enum class Severity
+{
+	FATAL	= 1,	//State is totally unusable, must exit right now
+	ERROR	= 2,	//Design is unroutable, cannot continue
+	WARNING	= 3,	//Design may have an error, but we'll attempt to proceed at your own risk
+	NOTICE	= 4,	//Useful information about progress
+	VERBOSE	= 5,	//Detailed information end users may sometimes need, but not often
+	DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
+};
+
+/**
 	@brief The log sink
  */
 class LogSink
 {
 public:
 	virtual ~LogSink() {}
-
-	enum Severity
-	{
-		FATAL	= 1,	//State is totally unusable, must exit right now
-		ERROR	= 2,	//Design is unroutable, cannot continue
-		WARNING	= 3,	//Design may have an error, but we'll attempt to proceed at your own risk
-		NOTICE	= 4,	//Useful information about progress
-		VERBOSE	= 5,	//Detailed information end users may sometimes need, but not often
-		DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
-	};
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
@@ -57,7 +53,7 @@ public:
 class STDLogSink : public LogSink
 {
 public:
-	STDLogSink(Severity min_severity = VERBOSE);
+	STDLogSink(Severity min_severity = Severity::VERBOSE);
 	~STDLogSink() override;
 
 	void Log(Severity severity, const std::string &msg) override;
@@ -73,7 +69,7 @@ protected:
 class FILELogSink : public LogSink
 {
 public:
-	FILELogSink(FILE *f, bool line_buffered = false, Severity min_severity = VERBOSE);
+	FILELogSink(FILE *f, bool line_buffered = false, Severity min_severity = Severity::VERBOSE);
 	~FILELogSink() override;
 
 	void Log(Severity severity, const std::string &msg) override;
@@ -94,7 +90,7 @@ bool ParseLoggerArguments(
 	int& i,
 	int argc,
 	char* argv[],
-	LogSink::Severity& console_verbosity);
+	Severity& console_verbosity);
 	
 
 #ifdef __GNUC__
@@ -113,7 +109,7 @@ ATTR_FORMAT(1, 2) void LogDebug(const char *format, ...);
 ATTR_FORMAT(1, 2) ATTR_NORETURN void LogFatal(const char *format, ...);
 
 ///Just print the message at given log level, don't do anything special for warnings or errors
-ATTR_FORMAT(2, 3) void Log(LogSink::Severity severity, const char *format, ...);
+ATTR_FORMAT(2, 3) void Log(Severity severity, const char *format, ...);
 
 #undef ATTR_FORMAT
 #undef ATTR_NORETURN
