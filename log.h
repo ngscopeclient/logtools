@@ -30,22 +30,25 @@
 #include <vector>
 
 /**
+	@brief The message severity
+ */
+enum class Severity
+{
+	FATAL	= 1,	//State is totally unusable, must exit right now
+	ERROR	= 2,	//Design is unroutable, cannot continue
+	WARNING	= 3,	//Design may have an error, but we'll attempt to proceed at your own risk
+	NOTICE	= 4,	//Useful information about progress
+	VERBOSE	= 5,	//Detailed information end users may sometimes need, but not often
+	DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
+};
+
+/**
 	@brief The log sink
  */
 class LogSink
 {
 public:
 	virtual ~LogSink() {}
-
-	enum Severity
-	{
-		FATAL	= 1,	//State is totally unusable, must exit right now
-		ERROR	= 2,	//Design is unroutable, cannot continue
-		WARNING	= 3,	//Design may have an error, but we'll attempt to proceed at your own risk
-		NOTICE	= 4,	//Useful information about progress
-		VERBOSE	= 5,	//Detailed information end users may sometimes need, but not often
-		DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
-	};
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
@@ -57,7 +60,7 @@ public:
 class STDLogSink : public LogSink
 {
 public:
-	STDLogSink(Severity min_severity = VERBOSE);
+	STDLogSink(Severity min_severity = Severity::VERBOSE);
 	~STDLogSink() override;
 
 	void Log(Severity severity, const std::string &msg) override;
@@ -73,7 +76,7 @@ protected:
 class FILELogSink : public LogSink
 {
 public:
-	FILELogSink(FILE *f, bool line_buffered = false, Severity min_severity = VERBOSE);
+	FILELogSink(FILE *f, bool line_buffered = false, Severity min_severity = Severity::VERBOSE);
 	~FILELogSink() override;
 
 	void Log(Severity severity, const std::string &msg) override;
@@ -94,7 +97,7 @@ bool ParseLoggerArguments(
 	int& i,
 	int argc,
 	char* argv[],
-	LogSink::Severity& console_verbosity);
+	Severity& console_verbosity);
 	
 
 #ifdef __GNUC__
@@ -113,7 +116,7 @@ ATTR_FORMAT(1, 2) void LogDebug(const char *format, ...);
 ATTR_FORMAT(1, 2) ATTR_NORETURN void LogFatal(const char *format, ...);
 
 ///Just print the message at given log level, don't do anything special for warnings or errors
-ATTR_FORMAT(2, 3) void Log(LogSink::Severity severity, const char *format, ...);
+ATTR_FORMAT(2, 3) void Log(Severity severity, const char *format, ...);
 
 #undef ATTR_FORMAT
 #undef ATTR_NORETURN
