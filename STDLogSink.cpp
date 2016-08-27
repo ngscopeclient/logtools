@@ -46,7 +46,7 @@ STDLogSink::~STDLogSink()
 
 void STDLogSink::Log(Severity severity, const std::string &msg)
 {
-	if(severity <= WARNING)
+	if(severity <= Severity::WARNING)
 	{
 		//Prevent newer messages on stderr from appearing before older messages on stdout
 		fflush(stdout);
@@ -62,7 +62,7 @@ void STDLogSink::Log(Severity severity, const std::string &msg)
 
 void STDLogSink::Log(Severity severity, const char *format, va_list va) 
 {
-	if(severity <= WARNING)
+	if(severity <= Severity::WARNING)
 	{
 		//See above
 		fflush(stdout);

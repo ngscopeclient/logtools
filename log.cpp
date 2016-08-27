@@ -39,25 +39,25 @@ bool ParseLoggerArguments(
 	int& i,
 	int argc,
 	char* argv[],
-	LogSink::Severity& console_verbosity)
+	Severity& console_verbosity)
 {
 	string s(argv[i]);
 	
 	if(s == "-q" || s == "--quiet")
 	{
-		if(console_verbosity == LogSink::DEBUG)
-			console_verbosity = LogSink::VERBOSE;
-		else if(console_verbosity == LogSink::VERBOSE)
-			console_verbosity = LogSink::NOTICE;
-		else if(console_verbosity == LogSink::NOTICE)
-			console_verbosity = LogSink::WARNING;
-		else if(console_verbosity == LogSink::WARNING)
-			console_verbosity = LogSink::ERROR;
+		if(console_verbosity == Severity::DEBUG)
+			console_verbosity = Severity::VERBOSE;
+		else if(console_verbosity == Severity::VERBOSE)
+			console_verbosity = Severity::NOTICE;
+		else if(console_verbosity == Severity::NOTICE)
+			console_verbosity = Severity::WARNING;
+		else if(console_verbosity == Severity::WARNING)
+			console_verbosity = Severity::ERROR;
 	}
 	else if(s == "--verbose")
-		console_verbosity = LogSink::VERBOSE;
+		console_verbosity = Severity::VERBOSE;
 	else if(s == "--debug")
-		console_verbosity = LogSink::DEBUG;
+		console_verbosity = Severity::DEBUG;
 	else if(s == "-l" || s == "--logfile" ||
 			s == "-L" || s == "--logfile-lines")
 	{
@@ -87,13 +87,13 @@ void LogFatal(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(LogSink::FATAL, "INTERNAL ERROR: ");
+		sink->Log(Severity::FATAL, "INTERNAL ERROR: ");
 
 		va_start(va, format);
-		sink->Log(LogSink::FATAL, format, va);
+		sink->Log(Severity::FATAL, format, va);
 		va_end(va);
 
-		sink->Log(LogSink::FATAL, 
+		sink->Log(Severity::FATAL,
 			"    This indicates a bug in the program, please file a report via Github\n");
 	}
 
@@ -104,10 +104,10 @@ void LogError(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(LogSink::ERROR, "ERROR: ");
+		sink->Log(Severity::ERROR, "ERROR: ");
 
 		va_start(va, format);
-		sink->Log(LogSink::ERROR, format, va);
+		sink->Log(Severity::ERROR, format, va);
 		va_end(va);
 	}
 }
@@ -116,10 +116,10 @@ void LogWarning(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(LogSink::WARNING, "Warning: ");
+		sink->Log(Severity::WARNING, "Warning: ");
 
 		va_start(va, format);
-		sink->Log(LogSink::WARNING, format, va);
+		sink->Log(Severity::WARNING, format, va);
 		va_end(va);
 	}
 }
@@ -129,7 +129,7 @@ void LogNotice(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(LogSink::NOTICE, format, va);
+		sink->Log(Severity::NOTICE, format, va);
 		va_end(va);
 	}
 }
@@ -139,7 +139,7 @@ void LogVerbose(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(LogSink::VERBOSE, format, va);
+		sink->Log(Severity::VERBOSE, format, va);
 		va_end(va);
 	}
 }
@@ -149,12 +149,12 @@ void LogDebug(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(LogSink::DEBUG, format, va);
+		sink->Log(Severity::DEBUG, format, va);
 		va_end(va);
 	}
 }
 
-void Log(LogSink::Severity severity, const char *format, ...)
+void Log(Severity severity, const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
