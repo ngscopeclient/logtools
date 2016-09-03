@@ -42,7 +42,7 @@ bool ParseLoggerArguments(
 	Severity& console_verbosity)
 {
 	string s(argv[i]);
-	
+
 	if(s == "-q" || s == "--quiet")
 	{
 		if(console_verbosity == Severity::DEBUG)
@@ -71,11 +71,11 @@ bool ParseLoggerArguments(
 			printf("%s requires an argument\n", s.c_str());
 		}
 	}
-	
+
 	//Unrecognized argument
 	else
 		return false;
-		
+
 	//We parsed this arg, caller should ignore it
 	return true;
 }

@@ -98,7 +98,7 @@ bool ParseLoggerArguments(
 	int argc,
 	char* argv[],
 	Severity& console_verbosity);
-	
+
 
 #ifdef __GNUC__
 #define ATTR_FORMAT(n, m) __attribute__((__format__ (__printf__, n, m)))

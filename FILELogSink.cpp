@@ -35,7 +35,7 @@ FILELogSink::FILELogSink(FILE *f, bool line_buffered, Severity min_severity)
 	: m_file(f)
 	, m_min_severity(min_severity)
 {
-	if(line_buffered) 
+	if(line_buffered)
 		setvbuf(f, NULL, _IOLBF, 0);
 }
 
@@ -45,7 +45,7 @@ FILELogSink::~FILELogSink()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Logging 
+// Logging
 
 void FILELogSink::Log(Severity severity, const std::string &msg)
 {
@@ -53,7 +53,7 @@ void FILELogSink::Log(Severity severity, const std::string &msg)
 		fputs(msg.c_str(), m_file);
 }
 
-void FILELogSink::Log(Severity severity, const char *format, va_list va) 
+void FILELogSink::Log(Severity severity, const char *format, va_list va)
 {
 	if(severity <= m_min_severity)
 		vfprintf(m_file, format, va);

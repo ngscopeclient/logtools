@@ -42,7 +42,7 @@ STDLogSink::~STDLogSink()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Logging 
+// Logging
 
 void STDLogSink::Log(Severity severity, const std::string &msg)
 {
@@ -60,7 +60,7 @@ void STDLogSink::Log(Severity severity, const std::string &msg)
 		fputs(msg.c_str(), stdout);
 }
 
-void STDLogSink::Log(Severity severity, const char *format, va_list va) 
+void STDLogSink::Log(Severity severity, const char *format, va_list va)
 {
 	if(severity <= Severity::WARNING)
 	{
