@@ -64,7 +64,7 @@ bool ParseLoggerArguments(
 		bool line_buffered = (s == "-L" || s == "--logfile-lines");
 		if(i+1 < argc) {
 			FILE *log = fopen(argv[++i], "wt");
-			g_log_sinks.emplace_back(new FILELogSink(log, line_buffered));
+			g_log_sinks.emplace_back(new FILELogSink(log, line_buffered, console_verbosity));
 		}
 		else
 		{
