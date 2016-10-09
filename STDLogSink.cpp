@@ -64,8 +64,41 @@ STDLogSink::~STDLogSink()
  */
 string STDLogSink::WrapString(string str)
 {
-	//TODO: Split the string into lines at \n characters
-	return GetIndentString() + str;
+	string ret = "";
+
+	//Cache the indent string so we don't have to re-generate it each time
+	string indent = GetIndentString();
+
+	//Split the string into lines
+	string tmp = indent;
+	for(size_t i=0; i<str.length(); i++)
+	{
+		//Append it
+		char ch = str[i];
+		tmp += ch;
+
+		//If the pending line is longer than m_termWidth, break it up
+		if(tmp.length() == m_termWidth)
+		{
+			ret += tmp;
+			ret += "\n";
+			tmp = indent;
+		}
+
+		//If we hit a newline, wrap and indent the next line
+		if(ch == '\n')
+		{
+			ret += tmp;
+			tmp = indent;
+		}
+	}
+
+	//If we have any remaining stuff, append it
+	if(tmp != indent)
+		ret += tmp;
+
+	//Done
+	return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
