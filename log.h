@@ -79,7 +79,7 @@ public:
 		No parsing of newline etc characters is performed.
 	 */
 	std::string GetIndentString()
-	{ return std::string(m_indentSize * m_indentLevel, '_'); }
+	{ return std::string(m_indentSize * m_indentLevel, ' '); }
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
