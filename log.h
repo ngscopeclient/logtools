@@ -106,7 +106,12 @@ public:
 	void Log(Severity severity, const char *format, va_list va) override;
 
 protected:
+	std::string WrapString(std::string str);
+
 	Severity	m_min_severity;
+
+	/// @brief Width of the console we're printing to
+	unsigned int m_termWidth;
 
 };
 /**

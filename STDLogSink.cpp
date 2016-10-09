@@ -28,12 +28,27 @@
 #include <cstdarg>
 #include <string>
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Construction / destruction
 
 STDLogSink::STDLogSink(Severity min_severity)
 	: m_min_severity(min_severity)
 {
+	//TODO: Get it via escape sequences or something?
+	m_termWidth = 80;
+
+	//For now, get the actual terminal width on Linux via stty
+#ifdef __linux__
+	FILE* fp = popen("stty size", "r");
+	if(fp == NULL)
+		return;
+	unsigned int height;
+	fscanf(fp, "%u %u", &height, &m_termWidth);
+	pclose(fp);
+#endif
+
 }
 
 STDLogSink::~STDLogSink()
@@ -42,36 +57,53 @@ STDLogSink::~STDLogSink()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// String formatting
+
+/**
+	@brief Wraps long lines and adds indentation as needed
+ */
+string STDLogSink::WrapString(string str)
+{
+	//TODO: Split the string into lines at \n characters
+	return str;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Logging
 
-void STDLogSink::Log(Severity severity, const std::string &msg)
+void STDLogSink::Log(Severity severity, const string &msg)
 {
+	//Skip messages which aren't important enough
+	if(severity > m_min_severity)
+		return;
+
+	//Prevent newer messages on stderr from appearing before older messages on stdout
 	if(severity <= Severity::WARNING)
-	{
-		//Prevent newer messages on stderr from appearing before older messages on stdout
 		fflush(stdout);
 
-		fputs(msg.c_str(), stderr);
+	//Wrap the string and re-indent as needed
+	string wrapped = WrapString(msg);
+	fputs(wrapped.c_str(), stderr);
 
-		//Ensure that this message is displayed immediately even if we print lower severity stuff later
+	//Ensure that this message is displayed immediately even if we print lower severity stuff later
+	if(severity <= Severity::WARNING)
 		fflush(stderr);
-	}
-	else if(severity <= m_min_severity)
-		fputs(msg.c_str(), stdout);
 }
 
 void STDLogSink::Log(Severity severity, const char *format, va_list va)
 {
+	//Skip messages which aren't important enough
+	if(severity > m_min_severity)
+		return;
+
+	//Prevent newer messages on stderr from appearing before older messages on stdout
 	if(severity <= Severity::WARNING)
-	{
-		//See above
 		fflush(stdout);
 
-		vfprintf(stderr, format, va);
+	//TODO: do formatting etc
+	vfprintf(stderr, format, va);
 
-		//See above
+	//Ensure that this message is displayed immediately even if we print lower severity stuff later
+	if(severity <= Severity::WARNING)
 		fflush(stderr);
-	}
-	else if(severity <= m_min_severity)
-		vfprintf(stdout, format, va);
 }
