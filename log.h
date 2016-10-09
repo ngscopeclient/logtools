@@ -43,7 +43,7 @@ enum class Severity
 };
 
 /**
-	@brief The log sink
+	@brief Base class for all log sinks
  */
 class LogSink
 {
@@ -55,14 +55,31 @@ public:
 
 	virtual ~LogSink() {}
 
+	/**
+		@brief Increase the indentation level
+	 */
 	void Indent()
-	{ m_indentLevel ++; }
+	{
+		m_indentLevel ++;
+	}
 
+	/**
+		@brief Reduce the indentation level
+	 */
 	void Unindent()
 	{
 		if(m_indentLevel)
 			m_indentLevel --;
 	}
+
+	/**
+		@brief Gets the indent string for use by the convenience wrappers.
+
+		Each log message printed by the wrappers is prefixed with (indentLevel * indentSize) space characters.
+		No parsing of newline etc characters is performed.
+	 */
+	std::string GetIndentString()
+	{ return std::string(m_indentSize * m_indentLevel, ' '); }
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
@@ -77,7 +94,7 @@ protected:
 };
 
 /**
-	@brief The log sink writing to stdout/stderr
+	@brief A log sink writing to stdout/stderr
  */
 class STDLogSink : public LogSink
 {
@@ -93,7 +110,7 @@ protected:
 
 };
 /**
-	@brief The log sink writing to a FILE* file handle
+	@brief A log sink writing to a FILE* file handle
  */
 class FILELogSink : public LogSink
 {
