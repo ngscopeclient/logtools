@@ -48,10 +48,32 @@ enum class Severity
 class LogSink
 {
 public:
+	LogSink()
+	: m_indentSize(4)
+	, m_indentLevel(0)
+	{}
+
 	virtual ~LogSink() {}
+
+	void Indent()
+	{ m_indentLevel ++; }
+
+	void Unindent()
+	{
+		if(m_indentLevel)
+			m_indentLevel --;
+	}
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
+
+protected:
+
+	/// @brief Number of spaces in one indentation
+	unsigned int m_indentSize;
+
+	/// @brief Number of levels to indent messages
+	unsigned int m_indentLevel;
 };
 
 /**
