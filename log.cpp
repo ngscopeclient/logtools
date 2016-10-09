@@ -87,7 +87,7 @@ void LogFatal(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::FATAL, log->GetIndentString());
+		sink->Log(Severity::FATAL, sink->GetIndentString());
 		sink->Log(Severity::FATAL, "INTERNAL ERROR: ");
 
 		va_start(va, format);
@@ -105,7 +105,7 @@ void LogError(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::ERROR, log->GetIndentString());
+		sink->Log(Severity::ERROR, sink->GetIndentString());
 		sink->Log(Severity::ERROR, "ERROR: ");
 
 		va_start(va, format);
@@ -118,7 +118,7 @@ void LogWarning(const char *format, ...)
 {
 	va_list va;
 	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::WARNING, log->GetIndentString());
+		sink->Log(Severity::WARNING, sink->GetIndentString());
 		sink->Log(Severity::WARNING, "Warning: ");
 
 		va_start(va, format);
@@ -132,7 +132,7 @@ void LogNotice(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(Severity::NOTICE, log->GetIndentString());
+		sink->Log(Severity::NOTICE, sink->GetIndentString());
 		sink->Log(Severity::NOTICE, format, va);
 		va_end(va);
 	}
@@ -143,7 +143,7 @@ void LogVerbose(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(Severity::VERBOSE, log->GetIndentString());
+		sink->Log(Severity::VERBOSE, sink->GetIndentString());
 		sink->Log(Severity::VERBOSE, format, va);
 		va_end(va);
 	}
@@ -154,7 +154,7 @@ void LogDebug(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(Severity::DEBUG, log->GetIndentString());
+		sink->Log(Severity::DEBUG, sink->GetIndentString());
 		sink->Log(Severity::DEBUG, format, va);
 		va_end(va);
 	}
@@ -165,7 +165,7 @@ void Log(Severity severity, const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(severity, log->GetIndentString());
+		sink->Log(severity, sink->GetIndentString());
 		sink->Log(severity, format, va);
 		va_end(va);
 	}
