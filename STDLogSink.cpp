@@ -53,7 +53,7 @@ void STDLogSink::Log(Severity severity, const std::string &msg)
 
 		fputs(msg.c_str(), stderr);
 
-		//Ensure that this message is displayed immediately even if we later print lower severity stuff later
+		//Ensure that this message is displayed immediately even if we print lower severity stuff later
 		fflush(stderr);
 	}
 	else if(severity <= m_min_severity)
