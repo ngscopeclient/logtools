@@ -65,7 +65,7 @@ STDLogSink::~STDLogSink()
 string STDLogSink::WrapString(string str)
 {
 	//TODO: Split the string into lines at \n characters
-	return str;
+	return GetIndentString() + str;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +100,15 @@ void STDLogSink::Log(Severity severity, const char *format, va_list va)
 	if(severity <= Severity::WARNING)
 		fflush(stdout);
 
-	//TODO: do formatting etc
-	vfprintf(stderr, format, va);
+	//Convert to an in-memory buffer we can do wrapping on
+	//TODO: handle truncation if buffer is too small
+	char buf[2048];
+	vsnprintf(buf, sizeof(buf), format, va);
+	string msg(buf);
+
+	//Wrap the string and re-indent as needed
+	string wrapped = WrapString(msg);
+	fputs(wrapped.c_str(), stderr);
 
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)

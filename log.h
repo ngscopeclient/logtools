@@ -73,13 +73,13 @@ public:
 	}
 
 	/**
-		@brief Gets the indent string for use by the convenience wrappers.
+		@brief Gets the indent string (for now, only used by STDLogSink)
 
-		Each log message printed by the wrappers is prefixed with (indentLevel * indentSize) space characters.
+		Each log message printed is prefixed with (indentLevel * indentSize) space characters.
 		No parsing of newline etc characters is performed.
 	 */
 	std::string GetIndentString()
-	{ return std::string(m_indentSize * m_indentLevel, ' '); }
+	{ return std::string(m_indentSize * m_indentLevel, '_'); }
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;

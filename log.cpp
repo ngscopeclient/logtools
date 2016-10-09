@@ -85,13 +85,14 @@ bool ParseLoggerArguments(
 
 void LogFatal(const char *format, ...)
 {
-	va_list va;
-	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::FATAL, sink->GetIndentString());
-		sink->Log(Severity::FATAL, "INTERNAL ERROR: ");
+	string sformat("INTERNAL ERROR: ");
+	sformat += format;
 
+	va_list va;
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(Severity::FATAL, format, va);
+		sink->Log(Severity::FATAL, sformat.c_str(), va);
 		va_end(va);
 
 		sink->Log(Severity::FATAL,
@@ -103,26 +104,28 @@ void LogFatal(const char *format, ...)
 
 void LogError(const char *format, ...)
 {
-	va_list va;
-	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::ERROR, sink->GetIndentString());
-		sink->Log(Severity::ERROR, "ERROR: ");
+	string sformat("ERROR: ");
+	sformat += format;
 
+	va_list va;
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(Severity::ERROR, format, va);
+		sink->Log(Severity::ERROR, sformat.c_str(), va);
 		va_end(va);
 	}
 }
 
 void LogWarning(const char *format, ...)
 {
-	va_list va;
-	for(auto &sink : g_log_sinks) {
-		sink->Log(Severity::WARNING, sink->GetIndentString());
-		sink->Log(Severity::WARNING, "Warning: ");
+	string sformat("Warning: ");
+	sformat += format;
 
+	va_list va;
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(Severity::WARNING, format, va);
+		sink->Log(Severity::WARNING, sformat.c_str(), va);
 		va_end(va);
 	}
 }
@@ -130,9 +133,9 @@ void LogWarning(const char *format, ...)
 void LogNotice(const char *format, ...)
 {
 	va_list va;
-	for(auto &sink : g_log_sinks) {
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(Severity::NOTICE, sink->GetIndentString());
 		sink->Log(Severity::NOTICE, format, va);
 		va_end(va);
 	}
@@ -143,7 +146,6 @@ void LogVerbose(const char *format, ...)
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
-		sink->Log(Severity::VERBOSE, sink->GetIndentString());
 		sink->Log(Severity::VERBOSE, format, va);
 		va_end(va);
 	}
@@ -152,9 +154,9 @@ void LogVerbose(const char *format, ...)
 void LogDebug(const char *format, ...)
 {
 	va_list va;
-	for(auto &sink : g_log_sinks) {
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(Severity::DEBUG, sink->GetIndentString());
 		sink->Log(Severity::DEBUG, format, va);
 		va_end(va);
 	}
@@ -163,9 +165,9 @@ void LogDebug(const char *format, ...)
 void Log(Severity severity, const char *format, ...)
 {
 	va_list va;
-	for(auto &sink : g_log_sinks) {
+	for(auto &sink : g_log_sinks)
+	{
 		va_start(va, format);
-		sink->Log(severity, sink->GetIndentString());
 		sink->Log(severity, format, va);
 		va_end(va);
 	}
