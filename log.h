@@ -130,6 +130,25 @@ protected:
 extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
 
 /**
+	@brief Scoping wrapper for log indentation
+ */
+class LogIndenter
+{
+public:
+	LogIndenter()
+	{
+		for(auto& s : g_log_sinks)
+			s->Indent();
+	}
+
+	~LogIndenter()
+	{
+		for(auto& s : g_log_sinks)
+			s->Unindent();
+	}
+};
+
+/**
 	@brief Helper function for parsing arguments that use common syntax
  */
 bool ParseLoggerArguments(
