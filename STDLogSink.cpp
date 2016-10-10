@@ -27,6 +27,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
+#include <sys/ioctl.h>
 
 using namespace std;
 
@@ -36,19 +37,10 @@ using namespace std;
 STDLogSink::STDLogSink(Severity min_severity)
 	: m_min_severity(min_severity)
 {
-	//TODO: Get it via escape sequences or something?
-	m_termWidth = 80;
+	struct winsize w;
+    ioctl(0, TIOCGWINSZ, &w);
 
-	//For now, get the actual terminal width on Linux via stty
-#ifdef __linux__
-	FILE* fp = popen("stty size", "r");
-	if(fp == NULL)
-		return;
-	unsigned int height;
-	fscanf(fp, "%u %u", &height, &m_termWidth);
-	pclose(fp);
-#endif
-
+	m_termWidth = w.ws_col;
 }
 
 STDLogSink::~STDLogSink()
