@@ -37,64 +37,25 @@ using namespace std;
 STDLogSink::STDLogSink(Severity min_severity)
 	: m_min_severity(min_severity)
 {
+	//Get the current display terminal width
 	struct winsize w;
     ioctl(0, TIOCGWINSZ, &w);
-
 	m_termWidth = w.ws_col;
 }
 
 STDLogSink::~STDLogSink()
 {
-	fflush(stdout);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// String formatting
-
-/**
-	@brief Wraps long lines and adds indentation as needed
- */
-string STDLogSink::WrapString(string str)
-{
-	string ret = "";
-
-	//Cache the indent string so we don't have to re-generate it each time
-	string indent = GetIndentString();
-
-	//Split the string into lines
-	string tmp = indent;
-	for(size_t i=0; i<str.length(); i++)
-	{
-		//Append it
-		char ch = str[i];
-		tmp += ch;
-
-		//If the pending line is longer than m_termWidth, break it up
-		if(tmp.length() == m_termWidth)
-		{
-			ret += tmp;
-			ret += "\n";
-			tmp = indent;
-		}
-
-		//If we hit a newline, wrap and indent the next line
-		if(ch == '\n')
-		{
-			ret += tmp;
-			tmp = indent;
-		}
-	}
-
-	//If we have any remaining stuff, append it
-	if(tmp != indent)
-		ret += tmp;
-
-	//Done
-	return ret;
+	Flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Logging
+
+void STDLogSink::Flush()
+{
+	fflush(stdout);
+	fflush(stderr);
+}
 
 void STDLogSink::Log(Severity severity, const string &msg)
 {
@@ -104,15 +65,18 @@ void STDLogSink::Log(Severity severity, const string &msg)
 
 	//Prevent newer messages on stderr from appearing before older messages on stdout
 	if(severity <= Severity::WARNING)
-		fflush(stdout);
+		Flush();
 
-	//Wrap the string and re-indent as needed
+	//Wrap/print it
 	string wrapped = WrapString(msg);
-	fputs(wrapped.c_str(), stderr);
+	if(severity <= Severity::WARNING)
+		fputs(wrapped.c_str(), stderr);
+	else
+		fputs(wrapped.c_str(), stdout);
 
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)
-		fflush(stderr);
+		Flush();
 }
 
 void STDLogSink::Log(Severity severity, const char *format, va_list va)
@@ -123,17 +87,14 @@ void STDLogSink::Log(Severity severity, const char *format, va_list va)
 
 	//Prevent newer messages on stderr from appearing before older messages on stdout
 	if(severity <= Severity::WARNING)
-		fflush(stdout);
+		Flush();
 
-	//Convert to an in-memory buffer we can do wrapping on
-	//TODO: handle truncation if buffer is too small
-	char buf[2048];
-	vsnprintf(buf, sizeof(buf), format, va);
-	string msg(buf);
-
-	//Wrap the string and re-indent as needed
-	string wrapped = WrapString(msg);
-	fputs(wrapped.c_str(), stderr);
+	//Wrap/print it
+	string wrapped = WrapString(vstrprintf(format, va));
+	if(severity <= Severity::WARNING)
+		fputs(wrapped.c_str(), stderr);
+	else
+		fputs(wrapped.c_str(), stdout);
 
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)

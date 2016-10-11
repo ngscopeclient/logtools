@@ -51,6 +51,7 @@ public:
 	LogSink()
 	: m_indentSize(4)
 	, m_indentLevel(0)
+	, m_termWidth(120)	//default if not using ioctls to check
 	{}
 
 	virtual ~LogSink() {}
@@ -84,17 +85,24 @@ public:
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
 
+	std::string vstrprintf(const char* format, va_list va);
+
 protected:
+
+	std::string WrapString(std::string str);
 
 	/// @brief Number of spaces in one indentation
 	unsigned int m_indentSize;
 
 	/// @brief Number of levels to indent messages
 	unsigned int m_indentLevel;
+
+	/// @brief Width of the console we're printing to
+	unsigned int m_termWidth;
 };
 
 /**
-	@brief A log sink writing to stdout/stderr
+	@brief A log sink writing to stdout/stderr depending on severity
  */
 class STDLogSink : public LogSink
 {
@@ -106,13 +114,9 @@ public:
 	void Log(Severity severity, const char *format, va_list va) override;
 
 protected:
-	std::string WrapString(std::string str);
+	void Flush();
 
 	Severity	m_min_severity;
-
-	/// @brief Width of the console we're printing to
-	unsigned int m_termWidth;
-
 };
 /**
 	@brief A log sink writing to a FILE* file handle

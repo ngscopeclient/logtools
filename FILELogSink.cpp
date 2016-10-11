@@ -28,6 +28,8 @@
 #include <cstdio>
 #include <cstdarg>
 
+using namespace std;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Construction / destruction
 
@@ -49,12 +51,20 @@ FILELogSink::~FILELogSink()
 
 void FILELogSink::Log(Severity severity, const std::string &msg)
 {
-	if(severity <= m_min_severity)
-		fputs(msg.c_str(), m_file);
+	if(severity > m_min_severity)
+		return;
+
+	//Wrap/print it
+	string wrapped = WrapString(msg);
+	fputs(wrapped.c_str(), m_file);
 }
 
 void FILELogSink::Log(Severity severity, const char *format, va_list va)
 {
-	if(severity <= m_min_severity)
-		vfprintf(m_file, format, va);
+	if(severity > m_min_severity)
+		return;
+
+	//Wrap/print it
+	string wrapped = WrapString(vstrprintf(format, va));
+	fputs(wrapped.c_str(), m_file);
 }

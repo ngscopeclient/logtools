@@ -33,6 +33,68 @@ using namespace std;
 vector<unique_ptr<LogSink>> g_log_sinks;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// String formatting
+
+/**
+	@brief Like sprintf, but self-managing a buffer with a std::string
+ */
+string LogSink::vstrprintf(const char* format, va_list va)
+{
+	//Figure out how much space we need
+	int len = vsnprintf(NULL, 0, format, va);
+	if(len < 0)
+		return "";
+
+	//and then format the real string
+	string ret;
+	ret.resize(len);
+	vsnprintf(&ret[0], len+1, format, va);
+	return ret;
+}
+
+/**
+	@brief Wraps long lines and adds indentation as needed
+ */
+string LogSink::WrapString(string str)
+{
+	string ret = "";
+
+	//Cache the indent string so we don't have to re-generate it each time
+	string indent = GetIndentString();
+
+	//Split the string into lines
+	string tmp = indent;
+	for(size_t i=0; i<str.length(); i++)
+	{
+		//Append it
+		char ch = str[i];
+		tmp += ch;
+
+		//If the pending line is longer than m_termWidth, break it up
+		if(tmp.length() == m_termWidth)
+		{
+			ret += tmp;
+			ret += "\n";
+			tmp = indent;
+		}
+
+		//If we hit a newline, wrap and indent the next line
+		if(ch == '\n')
+		{
+			ret += tmp;
+			tmp = indent;
+		}
+	}
+
+	//If we have any remaining stuff, append it
+	if(tmp != indent)
+		ret += tmp;
+
+	//Done
+	return ret;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Convenience function for parsing command-line arguments
 
 bool ParseLoggerArguments(
