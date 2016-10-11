@@ -49,8 +49,9 @@ string LogSink::vstrprintf(const char* format, va_list va)
 
 	//and then format the real string
 	string ret;
-	ret.resize(len);
+	ret.resize(len+1);
 	vsnprintf(&ret[0], len+1, format, va);
+	ret.resize(len);
 	return ret;
 }
 
