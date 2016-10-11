@@ -30,6 +30,8 @@
 
 using namespace std;
 
+mutex g_log_mutex;
+
 vector<unique_ptr<LogSink>> g_log_sinks;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,10 +145,12 @@ bool ParseLoggerArguments(
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Convenience functions that log into all configured sinks and apply indentation
+// Convenience functions that log into all configured sinks
 
 void LogFatal(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	string sformat("INTERNAL ERROR: ");
 	sformat += format;
 
@@ -166,6 +170,8 @@ void LogFatal(const char *format, ...)
 
 void LogError(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	string sformat("ERROR: ");
 	sformat += format;
 
@@ -180,6 +186,8 @@ void LogError(const char *format, ...)
 
 void LogWarning(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	string sformat("Warning: ");
 	sformat += format;
 
@@ -194,6 +202,8 @@ void LogWarning(const char *format, ...)
 
 void LogNotice(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	va_list va;
 	for(auto &sink : g_log_sinks)
 	{
@@ -205,6 +215,8 @@ void LogNotice(const char *format, ...)
 
 void LogVerbose(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	va_list va;
 	for(auto &sink : g_log_sinks) {
 		va_start(va, format);
@@ -215,6 +227,8 @@ void LogVerbose(const char *format, ...)
 
 void LogDebug(const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	va_list va;
 	for(auto &sink : g_log_sinks)
 	{
@@ -226,6 +240,8 @@ void LogDebug(const char *format, ...)
 
 void Log(Severity severity, const char *format, ...)
 {
+	lock_guard<mutex> lock(g_log_mutex);
+
 	va_list va;
 	for(auto &sink : g_log_sinks)
 	{

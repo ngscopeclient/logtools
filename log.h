@@ -28,6 +28,7 @@
 
 #include <memory>
 #include <vector>
+#include <mutex>
 
 /**
 	@brief The message severity
@@ -136,6 +137,7 @@ protected:
 
 };
 
+extern std::mutex g_log_mutex;
 extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
 
 /**
@@ -146,12 +148,16 @@ class LogIndenter
 public:
 	LogIndenter()
 	{
+		std::lock_guard<std::mutex> lock(g_log_mutex);
+
 		for(auto& s : g_log_sinks)
 			s->Indent();
 	}
 
 	~LogIndenter()
 	{
+		std::lock_guard<std::mutex> lock(g_log_mutex);
+
 		for(auto& s : g_log_sinks)
 			s->Unindent();
 	}
