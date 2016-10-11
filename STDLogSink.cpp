@@ -98,5 +98,5 @@ void STDLogSink::Log(Severity severity, const char *format, va_list va)
 
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)
-		fflush(stderr);
+		Flush();
 }
