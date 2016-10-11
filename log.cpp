@@ -43,7 +43,10 @@ vector<unique_ptr<LogSink>> g_log_sinks;
 string LogSink::vstrprintf(const char* format, va_list va)
 {
 	//Figure out how much space we need
-	int len = vsnprintf(NULL, 0, format, va);
+	va_list va_tmp;
+	va_copy(va_tmp, va);
+
+	int len = vsnprintf(NULL, 0, format, va_tmp);
 	if(len < 0)
 		return "";
 
