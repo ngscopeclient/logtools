@@ -31,6 +31,8 @@
 
 using namespace std;
 
+extern bool g_logToStdoutAlways = false;;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Construction / destruction
 
@@ -69,7 +71,7 @@ void STDLogSink::Log(Severity severity, const string &msg)
 
 	//Wrap/print it
 	string wrapped = WrapString(msg);
-	if(severity <= Severity::WARNING)
+	if( (severity <= Severity::WARNING) && !g_logToStdoutAlways )
 		fputs(wrapped.c_str(), stderr);
 	else
 		fputs(wrapped.c_str(), stdout);
@@ -91,7 +93,7 @@ void STDLogSink::Log(Severity severity, const char *format, va_list va)
 
 	//Wrap/print it
 	string wrapped = WrapString(vstrprintf(format, va));
-	if(severity <= Severity::WARNING)
+	if( (severity <= Severity::WARNING) && !g_logToStdoutAlways )
 		fputs(wrapped.c_str(), stderr);
 	else
 		fputs(wrapped.c_str(), stdout);

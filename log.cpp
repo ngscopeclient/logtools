@@ -34,6 +34,9 @@ mutex g_log_mutex;
 
 vector<unique_ptr<LogSink>> g_log_sinks;
 
+//set this for STDLogSink to only write to stdout even for error/warning severity
+bool g_logToStdoutAlways = false;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // String formatting
 
@@ -139,6 +142,8 @@ bool ParseLoggerArguments(
 			printf("%s requires an argument\n", s.c_str());
 		}
 	}
+	else if(s == "--stdout-only")
+		g_logToStdoutAlways = true;
 
 	//Unrecognized argument
 	else
