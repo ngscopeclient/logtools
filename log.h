@@ -53,6 +53,7 @@ public:
 	: m_indentSize(4)
 	, m_indentLevel(0)
 	, m_termWidth(120)	//default if not using ioctls to check
+	, m_lastMessageWasNewline(true)
 	{}
 
 	virtual ~LogSink() {}
@@ -100,6 +101,9 @@ protected:
 
 	/// @brief Width of the console we're printing to
 	unsigned int m_termWidth;
+
+	/// @brief True if the last message ended in a \n character
+	bool m_lastMessageWasNewline;
 };
 
 /**

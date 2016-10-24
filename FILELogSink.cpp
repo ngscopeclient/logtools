@@ -57,6 +57,12 @@ void FILELogSink::Log(Severity severity, const std::string &msg)
 	//Wrap/print it
 	string wrapped = WrapString(msg);
 	fputs(wrapped.c_str(), m_file);
+
+	//See if we printed a \n
+	if(wrapped.length() && (wrapped[wrapped.length() - 1] == '\n'))
+		m_lastMessageWasNewline = true;
+	else if(wrapped != "")
+		m_lastMessageWasNewline = false;
 }
 
 void FILELogSink::Log(Severity severity, const char *format, va_list va)
@@ -67,4 +73,10 @@ void FILELogSink::Log(Severity severity, const char *format, va_list va)
 	//Wrap/print it
 	string wrapped = WrapString(vstrprintf(format, va));
 	fputs(wrapped.c_str(), m_file);
+
+	//See if we printed a \n
+	if(wrapped.length() && (wrapped[wrapped.length() - 1] == '\n'))
+		m_lastMessageWasNewline = true;
+	else if(wrapped != "")
+		m_lastMessageWasNewline = false;
 }

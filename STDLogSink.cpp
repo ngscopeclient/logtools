@@ -79,6 +79,12 @@ void STDLogSink::Log(Severity severity, const string &msg)
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)
 		Flush();
+
+	//See if we printed a \n
+	if(wrapped.length() && (wrapped[wrapped.length() - 1] == '\n'))
+		m_lastMessageWasNewline = true;
+	else if(wrapped != "")
+		m_lastMessageWasNewline = false;
 }
 
 void STDLogSink::Log(Severity severity, const char *format, va_list va)
@@ -101,4 +107,10 @@ void STDLogSink::Log(Severity severity, const char *format, va_list va)
 	//Ensure that this message is displayed immediately even if we print lower severity stuff later
 	if(severity <= Severity::WARNING)
 		Flush();
+
+	//See if we printed a \n
+	if(wrapped.length() && (wrapped[wrapped.length() - 1] == '\n'))
+		m_lastMessageWasNewline = true;
+	else if(wrapped != "")
+		m_lastMessageWasNewline = false;
 }

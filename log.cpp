@@ -72,7 +72,9 @@ string LogSink::WrapString(string str)
 	string indent = GetIndentString();
 
 	//Split the string into lines
-	string tmp = indent;
+	string tmp;
+	if(m_lastMessageWasNewline)
+		tmp = indent;
 	for(size_t i=0; i<str.length(); i++)
 	{
 		//Append it
