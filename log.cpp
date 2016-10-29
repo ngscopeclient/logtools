@@ -50,6 +50,8 @@ string LogSink::vstrprintf(const char* format, va_list va)
 	va_copy(va_tmp, va);
 
 	int len = vsnprintf(NULL, 0, format, va_tmp);
+	va_end(va_tmp);
+
 	if(len < 0)
 		return "";
 
