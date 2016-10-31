@@ -35,7 +35,7 @@ using namespace std;
 // Construction / destruction
 
 ColoredSTDLogSink::ColoredSTDLogSink(Severity min_severity)
-	: STDLogSink(min_severity);
+	: STDLogSink(min_severity)
 {
 
 }
