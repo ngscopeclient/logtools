@@ -86,6 +86,7 @@ string LogSink::WrapString(string str)
 		//If the pending line is longer than m_termWidth, break it up
 		if(tmp.length() == m_termWidth)
 		{
+			PreprocessLine(tmp);
 			ret += tmp;
 			ret += "\n";
 			tmp = indent;
@@ -94,6 +95,7 @@ string LogSink::WrapString(string str)
 		//If we hit a newline, wrap and indent the next line
 		if(ch == '\n')
 		{
+			PreprocessLine(tmp);
 			ret += tmp;
 			tmp = indent;
 		}
@@ -105,6 +107,13 @@ string LogSink::WrapString(string str)
 
 	//Done
 	return ret;
+}
+
+/**
+	@brief Do any processing required to a line before printing it. Nothing in the base class.
+ */
+void LogSink::PreprocessLine(string& line)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

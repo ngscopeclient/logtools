@@ -92,6 +92,7 @@ public:
 protected:
 
 	std::string WrapString(std::string str);
+	virtual void PreprocessLine(std::string& line);
 
 	/// @brief Number of spaces in one indentation
 	unsigned int m_indentSize;
@@ -123,6 +124,20 @@ protected:
 
 	Severity	m_min_severity;
 };
+
+/**
+	@brief A STDLogSink that colorizes "warning" or "error" keywords
+ */
+class ColoredSTDLogSink : public STDLogSink
+{
+public:
+	ColoredSTDLogSink(Severity min_severity = Severity::VERBOSE);
+	~ColoredSTDLogSink() override;
+
+protected:
+	void PreprocessLine(std::string& line) override;
+};
+
 /**
 	@brief A log sink writing to a FILE* file handle
  */

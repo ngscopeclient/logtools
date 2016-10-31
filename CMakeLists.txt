@@ -1,5 +1,6 @@
 add_library(log STATIC
 	log.cpp
+	ColoredSTDLogSink.cpp
 	STDLogSink.cpp
 	FILELogSink.cpp)
 
