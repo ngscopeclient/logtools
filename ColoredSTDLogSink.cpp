@@ -24,8 +24,8 @@
  **********************************************************************************************************************/
 
 #include "log.h"
-#include <cColoredSTDio>
-#include <cColoredSTDarg>
+#include <cstdio>
+#include <cstdarg>
 #include <string>
 #include <sys/ioctl.h>
 
