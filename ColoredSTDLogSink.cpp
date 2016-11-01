@@ -49,5 +49,60 @@ ColoredSTDLogSink::~ColoredSTDLogSink()
 
 void ColoredSTDLogSink::PreprocessLine(std::string& line)
 {
+	//strings we make red
+	static string red_strings[] =
+	{
+		"INTERNAL ERROR",
+		"ERROR",
+		"Error",
+		"error",
+	};
 
+	//ANSI escape codes
+	static string red = "\033[31;1m";
+	static string yellow = "\033[33;1m";
+	static string clear = "\033[0m";
+
+	//Bold red errors. If there's a colon after the message, do that too
+	for(auto s : red_strings)
+	{
+		line = replace(s + ":", red, clear, line);
+		//line = replace(s, red + s + clear, line);
+	}
+
+	//strings we make yellow
+	static string yellow_strings[] =
+	{
+		"WARNING",
+		"Warning",
+		"warning"
+	};
+
+	//Bold yellow warnings. If there's a colon after the message, do that too
+	for(auto s : yellow_strings)
+	{
+		line = replace(s + ":", yellow, clear, line);
+		//line = replace(s, yellow + s + clear, line);
+	}
+}
+
+//TODO: less copying
+string ColoredSTDLogSink::replace(
+	const string& search,
+	const string& before,
+	const string& after,
+	string subject)
+{
+	//If not found, return unchanged
+	size_t pos = subject.find(search);
+	if(pos == string::npos)
+		return subject;
+
+	//If found, change color starting beginning of the line until end of the string
+	size_t end = pos + search.length();
+	string ret = before;
+	ret += subject.substr(0, end);
+	ret += after;
+	ret += subject.substr(end);
+	return ret;
 }

@@ -136,6 +136,11 @@ public:
 
 protected:
 	void PreprocessLine(std::string& line) override;
+	std::string replace(
+		const std::string& search,
+		const std::string& before,
+		const std::string& after,
+		std::string subject);
 };
 
 /**

@@ -75,34 +75,37 @@ string LogSink::WrapString(string str)
 
 	//Split the string into lines
 	string tmp;
-	if(m_lastMessageWasNewline)
-		tmp = indent;
+	bool firstLine = true;
 	for(size_t i=0; i<str.length(); i++)
 	{
 		//Append it
 		char ch = str[i];
 		tmp += ch;
 
-		//If the pending line is longer than m_termWidth, break it up
-		if(tmp.length() == m_termWidth)
-		{
-			PreprocessLine(tmp);
-			ret += tmp;
-			ret += "\n";
-			tmp = indent;
-		}
+		//Unless line is overly long, or done, nothing to do
+		if( ( (tmp.length() + indent.length() )  < m_termWidth) && (ch != '\n') )
+			continue;
 
-		//If we hit a newline, wrap and indent the next line
-		if(ch == '\n')
-		{
-			PreprocessLine(tmp);
-			ret += tmp;
-			tmp = indent;
-		}
+		//We're ending this line
+		//Only indent the first line if the previous message ended in \n
+		if( (firstLine && m_lastMessageWasNewline) || !firstLine )
+			ret += indent;
+		firstLine = false;
+
+		//Add the line after preprocessing as needed
+		PreprocessLine(tmp);
+		ret += tmp;
+
+		//If we're wrapping due to a long line, add a \n to force it
+		if(ch != '\n')
+			ret += "\n";
+
+		//Either way, we're done with the current line
+		tmp = "";
 	}
 
 	//If we have any remaining stuff, append it
-	if(tmp != indent)
+	if(tmp != "")
 		ret += tmp;
 
 	//Done
