@@ -115,7 +115,7 @@ string LogSink::WrapString(string str)
 /**
 	@brief Do any processing required to a line before printing it. Nothing in the base class.
  */
-void LogSink::PreprocessLine(string& line)
+void LogSink::PreprocessLine(string& /*line*/)
 {
 }
 
