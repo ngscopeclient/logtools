@@ -27,7 +27,7 @@
 # Intended to be integrated into a larger project, not built standalone.
 # TODO: build as static library instead of shared?
 
-jtaghal:
+log:
     toolchain:      c++/generic
     type:           shlib
 
