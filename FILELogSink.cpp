@@ -63,6 +63,10 @@ void FILELogSink::Log(Severity severity, const std::string &msg)
 		m_lastMessageWasNewline = true;
 	else if(wrapped != "")
 		m_lastMessageWasNewline = false;
+
+	//Immediately flush log on fatal/error/warning so we can postmortem better in case of crash
+	if(severity <= Severity::WARNING)
+		fflush(m_file);
 }
 
 void FILELogSink::Log(Severity severity, const char *format, va_list va)
@@ -79,4 +83,8 @@ void FILELogSink::Log(Severity severity, const char *format, va_list va)
 		m_lastMessageWasNewline = true;
 	else if(wrapped != "")
 		m_lastMessageWasNewline = false;
+
+	//Immediately flush log on fatal/error/warning so we can postmortem better in case of crash
+	if(severity <= Severity::WARNING)
+		fflush(m_file);
 }
