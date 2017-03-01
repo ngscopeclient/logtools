@@ -30,6 +30,11 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#if defined(__MINGW32__) && !defined(__WINPTHREADS_VERSION)
+// Include mingw-std-threads extra header
+#include <mingw.mutex.h>
+#undef ERROR
+#endif
 
 /**
 	@brief The message severity
