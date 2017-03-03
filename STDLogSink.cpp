@@ -31,6 +31,7 @@
 #include <windows.h>
 #else
 #include <sys/ioctl.h>
+#include <unistd.h>
 #endif
 
 using namespace std;
