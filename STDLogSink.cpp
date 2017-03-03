@@ -45,9 +45,16 @@ STDLogSink::STDLogSink(Severity min_severity)
 {
 	//Get the current display terminal width
 #ifndef _WIN32
-	struct winsize w;
-	ioctl(0, TIOCGWINSZ, &w);
-	m_termWidth = w.ws_col;
+	if(isatty(stdout))
+	{
+		struct winsize w;
+		ioctl(0, TIOCGWINSZ, &w);
+		m_termWidth = w.ws_col;
+	}
+	else
+	{
+		m_termWidth = 120;	//reasonable default width for file logging
+	}
 #else
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
