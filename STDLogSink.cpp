@@ -46,7 +46,7 @@ STDLogSink::STDLogSink(Severity min_severity)
 {
 	//Get the current display terminal width
 #ifndef _WIN32
-	if(isatty(stdout))
+	if(isatty(STDOUT_FILENO))
 	{
 		struct winsize w;
 		ioctl(0, TIOCGWINSZ, &w);
