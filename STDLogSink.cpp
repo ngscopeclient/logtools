@@ -49,7 +49,7 @@ STDLogSink::STDLogSink(Severity min_severity)
 	if(isatty(STDOUT_FILENO))
 	{
 		struct winsize w;
-		ioctl(0, TIOCGWINSZ, &w);
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 		m_termWidth = w.ws_col;
 	}
 	else
