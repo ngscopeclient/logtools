@@ -206,11 +206,19 @@ bool ParseLoggerArguments(
 #define ATTR_NORETURN
 #endif
 
+///Helper for logging "trace" messages with the function name prepended to the message
+#ifdef __GNUC__
+#define LogTrace(fmt, ...) LogDebugTrace(__PRETTY_FUNCTION__, fmt, ##__VA_ARGS__)
+#else
+#define LogTrace(fmt, ...) LogDebugTrace(__func__, fmt, __VA_ARGS__)
+#endif
+
 ATTR_FORMAT(1, 2) void LogVerbose(const char *format, ...);
 ATTR_FORMAT(1, 2) void LogNotice(const char *format, ...);
 ATTR_FORMAT(1, 2) void LogWarning(const char *format, ...);
 ATTR_FORMAT(1, 2) void LogError(const char *format, ...);
 ATTR_FORMAT(1, 2) void LogDebug(const char *format, ...);
+ATTR_FORMAT(2, 3) void LogDebugTrace(const char* function, const char *format, ...);
 ATTR_FORMAT(1, 2) ATTR_NORETURN void LogFatal(const char *format, ...);
 
 ///Just print the message at given log level, don't do anything special for warnings or errors

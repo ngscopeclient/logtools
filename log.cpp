@@ -263,6 +263,25 @@ void LogDebug(const char *format, ...)
 	}
 }
 
+void LogDebugTrace(const char* function, const char *format, ...)
+{
+	lock_guard<mutex> lock(g_log_mutex);
+
+	//TODO: Check if we match a global "things we want to log" filter
+
+	va_list va;
+	for(auto &sink : g_log_sinks)
+	{
+		//First, print the function name prefix
+		sink->Log(Severity::DEBUG, string(function));
+
+		//then the message
+		va_start(va, format);
+		sink->Log(Severity::DEBUG, format, va);
+		va_end(va);
+	}
+}
+
 void Log(Severity severity, const char *format, ...)
 {
 	lock_guard<mutex> lock(g_log_mutex);
