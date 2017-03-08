@@ -37,6 +37,9 @@ vector<unique_ptr<LogSink>> g_log_sinks;
 //set this for STDLogSink to only write to stdout even for error/warning severity
 bool g_logToStdoutAlways = false;
 
+//Only print trace messages from classes in this set
+set<string> g_trace_filters;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // String formatting
 
@@ -149,9 +152,24 @@ bool ParseLoggerArguments(
 			s == "-L" || s == "--logfile-lines")
 	{
 		bool line_buffered = (s == "-L" || s == "--logfile-lines");
-		if(i+1 < argc) {
+		if(i+1 < argc)
+		{
 			FILE *log = fopen(argv[++i], "wt");
 			g_log_sinks.emplace_back(new FILELogSink(log, line_buffered, console_verbosity));
+		}
+		else
+		{
+			printf("%s requires an argument\n", s.c_str());
+		}
+	}
+	else if(s == "--trace")
+	{
+		if(i+1 < argc)
+		{
+			string sfilter = argv[++i];
+			if(sfilter == "::")
+				sfilter = "";
+			g_trace_filters.emplace(sfilter);
 		}
 		else
 		{
@@ -267,10 +285,28 @@ void LogDebugTrace(const char* function, const char *format, ...)
 {
 	lock_guard<mutex> lock(g_log_mutex);
 
+	//Early out (for performance) if we don't have any debug-level sinks
+	bool has_debug_sinks = false;
+	for(auto &sink : g_log_sinks)
+	{
+		if(sink->GetSeverity() >= Severity::DEBUG)
+		{
+			has_debug_sinks = true;
+			break;
+		}
+	}
+	if(!has_debug_sinks)
+		return;
+
+	string sfunc(function);
+
+	//Class and function names
+	string cls;
+	string name = sfunc;
+
 	//Member function?
 	//Parse out "class::function" from PRETTY_FUNCTION which includes the return type and full arg list
 	//This normally gives us zillions of templates we dont need to see!
-	string sfunc(function);
 	size_t colpos = sfunc.find("::");
 	size_t poff = sfunc.find("(", colpos);
 	size_t coff = sfunc.rfind(" ", colpos);
@@ -278,28 +314,31 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	{
 		//Get the function name
 		size_t namelen = poff - colpos - 2;
-		string name = sfunc.substr(colpos+2, namelen);
+		name = sfunc.substr(colpos+2, namelen);
 
 		//Get the class name
 		size_t clen = colpos - coff - 1;
-		string cls = sfunc.substr(coff + 1, clen);
-
-		//Format final result
-		sfunc = cls + "::" + name;
+		cls = sfunc.substr(coff + 1, clen);
 	}
 
 	//Global function
-	size_t soff = sfunc.find(" ");
-	poff = sfunc.find("(", soff);
-	if( (soff != string::npos) && (poff != string::npos) )
+	else
 	{
-		size_t namelen = poff - soff - 1;
-		string name = sfunc.substr(soff+1, namelen);
-
-		sfunc = string("::") + name;
+		size_t soff = sfunc.find(" ");
+		poff = sfunc.find("(", soff);
+		if( (soff != string::npos) && (poff != string::npos) )
+		{
+			size_t namelen = poff - soff - 1;
+			name = sfunc.substr(soff+1, namelen);
+		}
 	}
 
-	//TODO: Check if we match a global "things we want to log" filter
+	//Format final function name
+	sfunc = cls + "::" + name;
+
+	//Check if class name is in the "to log" list
+	if(g_trace_filters.find(cls) == g_trace_filters.end())
+		return;
 
 	va_list va;
 	for(auto &sink : g_log_sinks)

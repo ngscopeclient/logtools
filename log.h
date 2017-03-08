@@ -29,7 +29,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
 #include <mutex>
+
 #if defined(__MINGW32__) && !defined(__WINPTHREADS_VERSION)
 // Include mingw-std-threads extra header
 #include <mingw.mutex.h>
@@ -64,6 +66,9 @@ public:
 	{}
 
 	virtual ~LogSink() {}
+
+	Severity GetSeverity()
+	{ return m_min_severity; }
 
 	/**
 		@brief Increase the indentation level
@@ -169,6 +174,7 @@ protected:
 
 extern std::mutex g_log_mutex;
 extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
+extern std::set<std::string> g_trace_filters;
 
 /**
 	@brief Scoping wrapper for log indentation
