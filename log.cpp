@@ -282,7 +282,7 @@ void LogDebugTrace(const char* function, const char *format, ...)
 		string name = sfunc.substr(colpos+2, namelen);
 
 		//Get the class name
-		size_t clen = colpos - coff + 1;
+		size_t clen = colpos - coff - 1;
 		string cls = sfunc.substr(coff + 1, clen);
 
 		//Format final result
