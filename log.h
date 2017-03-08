@@ -55,11 +55,12 @@ enum class Severity
 class LogSink
 {
 public:
-	LogSink()
+	LogSink(Severity min_severity = Severity::VERBOSE)
 	: m_indentSize(4)
 	, m_indentLevel(0)
 	, m_termWidth(120)	//default if not using ioctls to check
 	, m_lastMessageWasNewline(true)
+	, m_min_severity(min_severity)
 	{}
 
 	virtual ~LogSink() {}
@@ -111,6 +112,9 @@ protected:
 
 	/// @brief True if the last message ended in a \n character
 	bool m_lastMessageWasNewline;
+
+	/// @brief Minimum severity of messages to be printed
+	Severity m_min_severity;
 };
 
 /**
@@ -127,8 +131,6 @@ public:
 
 protected:
 	void Flush();
-
-	Severity	m_min_severity;
 };
 
 /**
@@ -163,8 +165,6 @@ public:
 
 protected:
 	FILE		*m_file;
-	Severity	m_min_severity;
-
 };
 
 extern std::mutex g_log_mutex;

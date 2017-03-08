@@ -42,7 +42,7 @@ extern bool g_logToStdoutAlways;
 // Construction / destruction
 
 STDLogSink::STDLogSink(Severity min_severity)
-	: m_min_severity(min_severity)
+	: LogSink(min_severity)
 {
 	//Get the current display terminal width
 #ifndef _WIN32

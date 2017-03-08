@@ -34,8 +34,8 @@ using namespace std;
 // Construction / destruction
 
 FILELogSink::FILELogSink(FILE *f, bool line_buffered, Severity min_severity)
-	: m_file(f)
-	, m_min_severity(min_severity)
+	: LogSink(min_severity)
+	, m_file(f)
 {
 	if(line_buffered)
 		setvbuf(f, NULL, _IOLBF, 0);
