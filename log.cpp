@@ -267,13 +267,35 @@ void LogDebugTrace(const char* function, const char *format, ...)
 {
 	lock_guard<mutex> lock(g_log_mutex);
 
+	//Parse out "class::function" from PRETTY_FUNCTION which includes the return type and full arg list
+	//This normally gives us zillions of templates we dont need to see!
+	string sfunc(function);
+	size_t colpos = sfunc.find("::");
+	size_t poff = sfunc.find("(", colpos);
+	size_t coff = sfunc.rfind(" ", colpos);
+	if( (colpos != string::npos) && (poff != string::npos) && (coff != string::npos) )
+	{
+		//C++ function. If we don't get here it's a C function, so use the entire function name in the log message.
+
+		//Get the function name
+		size_t namelen = poff - colpos - 2;
+		string name = sfunc.substr(colpos+2, namelen);
+
+		//Get the class name
+		size_t clen = colpos - coff + 1;
+		string cls = sfunc.substr(coff + 1, clen);
+
+		//Format final result
+		sfunc = cls + "::" + name;
+	}
+
 	//TODO: Check if we match a global "things we want to log" filter
 
 	va_list va;
 	for(auto &sink : g_log_sinks)
 	{
 		//First, print the function name prefix
-		sink->Log(Severity::DEBUG, string(function));
+		sink->Log(Severity::DEBUG, string("[") + sfunc + "] ");
 
 		//then the message
 		va_start(va, format);
