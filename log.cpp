@@ -267,6 +267,7 @@ void LogDebugTrace(const char* function, const char *format, ...)
 {
 	lock_guard<mutex> lock(g_log_mutex);
 
+	//Member function?
 	//Parse out "class::function" from PRETTY_FUNCTION which includes the return type and full arg list
 	//This normally gives us zillions of templates we dont need to see!
 	string sfunc(function);
@@ -275,8 +276,6 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	size_t coff = sfunc.rfind(" ", colpos);
 	if( (colpos != string::npos) && (poff != string::npos) && (coff != string::npos) )
 	{
-		//C++ function. If we don't get here it's a C function, so use the entire function name in the log message.
-
 		//Get the function name
 		size_t namelen = poff - colpos - 2;
 		string name = sfunc.substr(colpos+2, namelen);
@@ -287,6 +286,17 @@ void LogDebugTrace(const char* function, const char *format, ...)
 
 		//Format final result
 		sfunc = cls + "::" + name;
+	}
+
+	//Global function
+	size_t soff = sfunc.find(" ");
+	poff = sfunc.find("(", soff);
+	if( (soff != string::npos) && (poff != string::npos) )
+	{
+		size_t namelen = poff - soff - 1;
+		string name = sfunc.substr(soff+1, namelen);
+
+		sfunc = string("::") + name;
 	}
 
 	//TODO: Check if we match a global "things we want to log" filter
