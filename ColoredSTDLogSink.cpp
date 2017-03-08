@@ -27,7 +27,6 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
-#include <sys/ioctl.h>
 
 using namespace std;
 

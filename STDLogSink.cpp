@@ -27,7 +27,12 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/ioctl.h>
+#include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -40,9 +45,22 @@ STDLogSink::STDLogSink(Severity min_severity)
 	: m_min_severity(min_severity)
 {
 	//Get the current display terminal width
-	struct winsize w;
-    ioctl(0, TIOCGWINSZ, &w);
-	m_termWidth = w.ws_col;
+#ifndef _WIN32
+	if(isatty(STDOUT_FILENO))
+	{
+		struct winsize w;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		m_termWidth = w.ws_col;
+	}
+	else
+	{
+		m_termWidth = 120;	//reasonable default width for file logging
+	}
+#else
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	m_termWidth = csbi.dwSize.X;
+#endif
 }
 
 STDLogSink::~STDLogSink()
