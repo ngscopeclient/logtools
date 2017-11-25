@@ -54,7 +54,7 @@ STDLogSink::STDLogSink(Severity min_severity)
 	}
 	else
 	{
-		m_termWidth = 120;	//reasonable default width for file logging
+		m_termWidth = UINT_MAX;	//don't wrap text if logging to a file
 	}
 #else
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
