@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- * Copyright (C) 2016 Andrew Zonenberg and contributors                                                                *
+ * Copyright (C) 2017 Andrew Zonenberg and contributors                                                                *
  *                                                                                                                     *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the    *
  * following conditions are met:                                                                                       *
@@ -344,7 +344,7 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	for(auto &sink : g_log_sinks)
 	{
 		//First, print the function name prefix
-		sink->Log(Severity::DEBUG, string("[") + sfunc + "] ");
+		sink->Log(Severity::DEBUG, string("[") + sfunc + "] " + sink->GetIndentString());
 
 		//then the message
 		va_start(va, format);

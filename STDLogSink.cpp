@@ -46,6 +46,7 @@ STDLogSink::STDLogSink(Severity min_severity)
 {
 	//Get the current display terminal width
 #ifndef _WIN32
+#ifndef __EMSCRIPTEN__
 	if(isatty(STDOUT_FILENO))
 	{
 		struct winsize w;
@@ -56,6 +57,9 @@ STDLogSink::STDLogSink(Severity min_severity)
 	{
 		m_termWidth = UINT_MAX;	//don't wrap text if logging to a file
 	}
+#else
+	m_termWidth = 120;	//for now, force emscripten to always 120 char wrapping
+#endif
 #else
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
