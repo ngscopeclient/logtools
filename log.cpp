@@ -307,18 +307,30 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	//Member function?
 	//Parse out "class::function" from PRETTY_FUNCTION which includes the return type and full arg list
 	//This normally gives us zillions of templates we dont need to see!
-	size_t colpos = sfunc.find("::");
-	size_t poff = sfunc.find("(", colpos);
-	size_t coff = sfunc.rfind(" ", colpos);
-	if( (colpos != string::npos) && (poff != string::npos) && (coff != string::npos) )
+	size_t poff = sfunc.rfind("(");
+	size_t colpos = sfunc.rfind("::", poff);
+	if( (colpos != string::npos) && (poff != string::npos))
 	{
 		//Get the function name
 		size_t namelen = poff - colpos - 2;
 		name = sfunc.substr(colpos+2, namelen);
 
-		//Get the class name
-		size_t clen = colpos - coff - 1;
-		cls = sfunc.substr(coff + 1, clen);
+		//Member function
+		int coff = name.find(" ");
+		if(coff == string::npos)
+		{
+			//Get the class name
+			size_t clen = colpos - coff - 1;
+			cls = sfunc.substr(coff + 1, clen);
+
+			//Remove any leading space-delimited values in the class name (return types etc)
+			coff = cls.rfind(" ");
+			cls = cls.substr(coff+1);
+		}
+
+		//Global function returning a namespaced type
+		else
+			name = name.substr(coff + 1);
 	}
 
 	//Global function
