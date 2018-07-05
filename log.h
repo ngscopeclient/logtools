@@ -32,10 +32,12 @@
 #include <set>
 #include <mutex>
 
-#if defined(__MINGW32__) && !defined(__WINPTHREADS_VERSION)
+#if defined(__MINGW32__)
+#undef ERROR
+#if !defined(__WINPTHREADS_VERSION)
 // Include mingw-std-threads extra header
 #include <mingw.mutex.h>
-#undef ERROR
+#endif
 #endif
 
 /**
