@@ -316,7 +316,7 @@ void LogDebugTrace(const char* function, const char *format, ...)
 		name = sfunc.substr(colpos+2, namelen);
 
 		//Member function
-		int coff = name.find(" ");
+		size_t coff = name.find(" ");
 		if(coff == string::npos)
 		{
 			//Get the class name
