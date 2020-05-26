@@ -53,6 +53,8 @@ enum class Severity
 	DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
 };
 
+extern __thread unsigned int g_logIndentLevel;
+
 /**
 	@brief Base class for all log sinks
  */
@@ -61,7 +63,6 @@ class LogSink
 public:
 	LogSink(Severity min_severity = Severity::VERBOSE)
 	: m_indentSize(4)
-	, m_indentLevel(0)
 	, m_termWidth(120)	//default if not using ioctls to check
 	, m_lastMessageWasNewline(true)
 	, m_min_severity(min_severity)
@@ -73,30 +74,13 @@ public:
 	{ return m_min_severity; }
 
 	/**
-		@brief Increase the indentation level
-	 */
-	void Indent()
-	{
-		m_indentLevel ++;
-	}
-
-	/**
-		@brief Reduce the indentation level
-	 */
-	void Unindent()
-	{
-		if(m_indentLevel)
-			m_indentLevel --;
-	}
-
-	/**
 		@brief Gets the indent string (for now, only used by STDLogSink)
 
 		Each log message printed is prefixed with (indentLevel * indentSize) space characters.
 		No parsing of newline etc characters is performed.
 	 */
 	std::string GetIndentString()
-	{ return std::string(m_indentSize * m_indentLevel, ' '); }
+	{ return std::string(m_indentSize * g_logIndentLevel, ' '); }
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
@@ -110,9 +94,6 @@ protected:
 
 	/// @brief Number of spaces in one indentation
 	unsigned int m_indentSize;
-
-	/// @brief Number of levels to indent messages
-	unsigned int m_indentLevel;
 
 	/// @brief Width of the console we're printing to
 	unsigned int m_termWidth;
@@ -186,18 +167,13 @@ class LogIndenter
 public:
 	LogIndenter()
 	{
-		std::lock_guard<std::mutex> lock(g_log_mutex);
-
-		for(auto& s : g_log_sinks)
-			s->Indent();
+		//no mutexing needed b/c thread local
+		g_logIndentLevel ++;
 	}
 
 	~LogIndenter()
 	{
-		std::lock_guard<std::mutex> lock(g_log_mutex);
-
-		for(auto& s : g_log_sinks)
-			s->Unindent();
+		g_logIndentLevel --;
 	}
 };
 

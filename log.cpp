@@ -32,6 +32,8 @@ using namespace std;
 
 mutex g_log_mutex;
 
+__thread unsigned int g_logIndentLevel = 0;
+
 vector<unique_ptr<LogSink>> g_log_sinks;
 
 //set this for STDLogSink to only write to stdout even for error/warning severity
