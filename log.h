@@ -197,9 +197,9 @@ bool ParseLoggerArguments(
 
 ///Helper for logging "trace" messages with the function name prepended to the message
 #ifdef __GNUC__
-#define LogTrace(fmt, ...) LogDebugTrace(__PRETTY_FUNCTION__, fmt, ##__VA_ARGS__)
+#define LogTrace(...) LogDebugTrace(__PRETTY_FUNCTION__, ##__VA_ARGS__)
 #else
-#define LogTrace(fmt, ...) LogDebugTrace(__func__, fmt, __VA_ARGS__)
+#define LogTrace(...) LogDebugTrace(__func__, __VA_ARGS__)
 #endif
 
 ATTR_FORMAT(1, 2) void LogVerbose(const char *format, ...);
