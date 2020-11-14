@@ -27,6 +27,7 @@
 #include <cstdio>
 #include <cstdarg>
 #include <string>
+#include <sstream>
 #include <limits.h>
 #ifdef _WIN32
 #include <windows.h>
@@ -62,9 +63,28 @@ STDLogSink::STDLogSink(Severity min_severity)
 	m_termWidth = 120;	//for now, force emscripten to always 120 char wrapping
 #endif
 #else
+	HANDLE h;
+	BOOL ret;
+	ostringstream msg;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	m_termWidth = csbi.dwSize.X;
+
+	m_termWidth = 80; //Pick a reasonable fallback value
+
+	h = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (h == INVALID_HANDLE_VALUE)
+	{
+		msg << "GetStdHandle() failed (" << GetLastError() << ");\n";
+		Log(Severity::WARNING, msg.str());
+	}
+	else if ((ret = GetConsoleScreenBufferInfo(h, &csbi)) == FALSE)
+	{
+		msg << "GetConsoleScreenBufferInfo() failed (" << GetLastError() << ");\n";
+		Log(Severity::WARNING, msg.str());
+	}
+	else
+	{
+		m_termWidth = csbi.dwSize.X;
+	}
 #endif
 }
 
