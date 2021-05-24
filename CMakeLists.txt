@@ -7,6 +7,7 @@ add_library(log SHARED
 	ColoredSTDLogSink.cpp
 	STDLogSink.cpp
 	FILELogSink.cpp)
+install(TARGETS log LIBRARY)
 else()
 add_library(log STATIC
 	log.cpp
