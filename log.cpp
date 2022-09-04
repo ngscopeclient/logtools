@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- * Copyright (C) 2017 Andrew Zonenberg and contributors                                                                *
+ * Copyright (C) 2017-2022 Andrew Zonenberg and contributors                                                           *
  *                                                                                                                     *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the    *
  * following conditions are met:                                                                                       *
@@ -350,8 +350,13 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	//Format final function name
 	sfunc = cls + "::" + name;
 
-	//Check if class name is in the "to log" list
-	if(g_trace_filters.find(cls) == g_trace_filters.end())
+	//Check if class or function name is in the "to log" list
+	if(cls == "")
+	{
+		if(g_trace_filters.find(sfunc) == g_trace_filters.end())
+			return;
+	}
+	else if(g_trace_filters.find(cls) == g_trace_filters.end())
 		return;
 
 	va_list va;
