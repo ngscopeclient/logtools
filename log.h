@@ -34,10 +34,6 @@
 
 #if defined(__MINGW32__)
 #undef ERROR
-#if !defined(__WINPTHREADS_VERSION)
-// Include mingw-std-threads extra header
-#include <mingw.mutex.h>
-#endif
 #endif
 
 /**
