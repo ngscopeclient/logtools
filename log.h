@@ -75,8 +75,7 @@ public:
 		Each log message printed is prefixed with (indentLevel * indentSize) space characters.
 		No parsing of newline etc characters is performed.
 	 */
-	std::string GetIndentString()
-	{ return std::string(m_indentSize * g_logIndentLevel, ' '); }
+	std::string GetIndentString();
 
 	virtual void Log(Severity severity, const std::string &msg) = 0;
 	virtual void Log(Severity severity, const char *format, va_list va) = 0;
@@ -161,16 +160,9 @@ extern std::set<std::string> g_trace_filters;
 class LogIndenter
 {
 public:
-	LogIndenter()
-	{
-		//no mutexing needed b/c thread local
-		g_logIndentLevel ++;
-	}
+	LogIndenter();
 
-	~LogIndenter()
-	{
-		g_logIndentLevel --;
-	}
+	~LogIndenter();
 };
 
 /**

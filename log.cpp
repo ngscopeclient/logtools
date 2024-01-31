@@ -68,6 +68,9 @@ string LogSink::vstrprintf(const char* format, va_list va)
 	return ret;
 }
 
+string LogSink::GetIndentString()
+	{ return std::string(m_indentSize * g_logIndentLevel, ' '); }
+
 /**
 	@brief Wraps long lines and adds indentation as needed
  */
@@ -122,6 +125,18 @@ string LogSink::WrapString(string str)
  */
 void LogSink::PreprocessLine(string& /*line*/)
 {
+}
+
+
+LogIndenter::LogIndenter()
+{
+	//no mutexing needed b/c thread local
+	g_logIndentLevel ++;
+}
+
+LogIndenter::~LogIndenter()
+{
+	g_logIndentLevel --;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
