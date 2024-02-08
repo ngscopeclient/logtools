@@ -176,9 +176,14 @@ bool ParseLoggerArguments(
 
 
 #ifdef __GNUC__
+#if defined(__MINGW32__) && !defined(__clang__)
+#define ATTR_FORMAT(n, m) __attribute__((__format__ (gnu_printf, n, m)))
+#else
 #define ATTR_FORMAT(n, m) __attribute__((__format__ (__printf__, n, m)))
+#endif
 #define ATTR_NORETURN     __attribute__((noreturn))
 #else
+//FIXME on MSVC/Windows
 #define ATTR_FORMAT(n, m)
 #define ATTR_NORETURN
 #endif
