@@ -1,30 +1,40 @@
 /***********************************************************************************************************************
- * Copyright (C) 2016 Andrew Zonenberg and contributors                                                                *
- *                                                                                                                     *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the    *
- * following conditions are met:                                                                                       *
- *                                                                                                                     *
- *    * Redistributions of source code must retain the above copyright notice, this list of conditions, and the        *
- *      following disclaimer.                                                                                          *
- *                                                                                                                     *
- *    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the      *
- *      following disclaimer in the documentation and/or other materials provided with the distribution.               *
- *                                                                                                                     *
- *    * Neither the name of the author nor the names of any contributors may be used to endorse or promote products    *
- *      derived from this software without specific prior written permission.                                          *
- *                                                                                                                     *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED  *
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL*
- * THE AUTHORS BE HELD LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES       *
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR      *
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT*
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE      *
- * POSSIBILITY OF SUCH DAMAGE.                                                                                         *
- *                                                                                                                     *
- **********************************************************************************************************************/
+*                                                                                                                      *
+* logtools                                                                                                             *
+*                                                                                                                      *
+* Copyright (c) 2016-2024 Andrew D. Zonenberg and contributors                                                         *
+* All rights reserved.                                                                                                 *
+*                                                                                                                      *
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that the     *
+* following conditions are met:                                                                                        *
+*                                                                                                                      *
+*    * Redistributions of source code must retain the above copyright notice, this list of conditions, and the         *
+*      following disclaimer.                                                                                           *
+*                                                                                                                      *
+*    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the       *
+*      following disclaimer in the documentation and/or other materials provided with the distribution.                *
+*                                                                                                                      *
+*    * Neither the name of the author nor the names of any contributors may be used to endorse or promote products     *
+*      derived from this software without specific prior written permission.                                           *
+*                                                                                                                      *
+* THIS SOFTWARE IS PROVIDED BY THE AUTHORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED   *
+* TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL *
+* THE AUTHORS BE HELD LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES        *
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR       *
+* BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT *
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                                                          *
+*                                                                                                                      *
+***********************************************************************************************************************/
 
 #ifndef log_h
 #define log_h
+
+/**
+	@file
+	@brief		Main logging framework header
+	@ingroup	liblog
+ */
 
 #include <memory>
 #include <string>
@@ -37,22 +47,35 @@
 #endif
 
 /**
-	@brief The message severity
+	@brief		Severity of a logging message
+	@ingroup	liblog
  */
 enum class Severity
 {
-	FATAL	= 1,	//State is totally unusable, must exit right now
-	ERROR	= 2,	//Design is unroutable, cannot continue
-	WARNING	= 3,	//Design may have an error, but we'll attempt to proceed at your own risk
-	NOTICE	= 4,	//Useful information about progress
-	VERBOSE	= 5,	//Detailed information end users may sometimes need, but not often
-	DEBUG = 6		//Extremely detailed information only useful to people working on the toolchain internals
+	///State is totally unusable, must exit right now. Aborts the program after printing.
+	FATAL	= 1,
+
+	///@brief Something went very wrong, an operation may be aborted or state may be confused
+	ERROR	= 2,
+
+	///@brief Something went wrong, but we'll attempt to proceed
+	WARNING	= 3,
+
+	///@brief Useful information about progress printed by default
+	NOTICE	= 4,
+
+	///@brief Detailed information end users may sometimes need, but not often
+	VERBOSE	= 5,
+
+	///@brief Extremely detailed information only useful to people working on application internals
+	DEBUG = 6
 };
 
 extern __thread unsigned int g_logIndentLevel;
 
 /**
-	@brief Base class for all log sinks
+	@brief		Base class for all log sinks
+	@ingroup	liblog
  */
 class LogSink
 {
@@ -66,6 +89,7 @@ public:
 
 	virtual ~LogSink() {}
 
+	///@brief Returns the current severity / verbosity level
 	Severity GetSeverity()
 	{ return m_min_severity; }
 
@@ -90,7 +114,7 @@ protected:
 	/// @brief Number of spaces in one indentation
 	unsigned int m_indentSize;
 
-	/// @brief Width of the console we're printing to
+	/// @brief Width of the console we're printing to, in characters
 	unsigned int m_termWidth;
 
 	/// @brief True if the last message ended in a \n character
@@ -102,6 +126,7 @@ protected:
 
 /**
 	@brief A log sink writing to stdout/stderr depending on severity
+	@ingroup	liblog
  */
 class STDLogSink : public LogSink
 {
@@ -117,7 +142,8 @@ protected:
 };
 
 /**
-	@brief A STDLogSink that colorizes "warning" or "error" keywords
+	@brief		A STDLogSink that colorizes "warning" or "error" keywords
+	@ingroup	liblog
  */
 class ColoredSTDLogSink : public STDLogSink
 {
@@ -135,7 +161,8 @@ protected:
 };
 
 /**
-	@brief A log sink writing to a FILE* file handle
+	@brief 		A log sink writing to a FILE* file handle
+	@ingroup	liblog
  */
 class FILELogSink : public LogSink
 {
@@ -155,7 +182,10 @@ extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
 extern std::set<std::string> g_trace_filters;
 
 /**
-	@brief Scoping wrapper for log indentation
+	@brief		RAII wrapper for log indentation
+	@ingroup	liblog
+
+	Log messages are indented once for each LogIndenter object in the call stack.
  */
 class LogIndenter
 {
@@ -166,7 +196,8 @@ public:
 };
 
 /**
-	@brief Helper function for parsing arguments that use common syntax
+	@brief		Helper function for parsing arguments that use common syntax
+	@ingroup	liblog
  */
 bool ParseLoggerArguments(
 	int& i,
@@ -188,7 +219,15 @@ bool ParseLoggerArguments(
 #define ATTR_NORETURN
 #endif
 
-///Helper for logging "trace" messages with the function name prepended to the message
+/**
+	\def(LogTrace(...)
+	@ingroup	liblog
+
+	Helper for logging "trace" messages with the class::function name prepended to the message.
+
+	Only printed if at debug level verbosity, plus explicitly turned on for this class or function
+	(usually by --trace command line argument)
+ */
 #ifdef __GNUC__
 #define LogTrace(...) LogDebugTrace(__PRETTY_FUNCTION__, ##__VA_ARGS__)
 #else
