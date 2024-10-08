@@ -448,9 +448,12 @@ string LogHexDump(const unsigned char* data, size_t len)
 	size_t tailPos = len - 4;
 	char buffer[8];
 	bool printable = false;
-	for (size_t i = 0; i < len; i++) {
-		if(i<=31 || i >= tailPos) {
-			if(!printable) {
+	for (size_t i = 0; i < len; i++) 
+	{
+		if(i<=31 || i >= tailPos) 
+		{
+			if(!printable) 
+			{
 				if (i)
 					result.append(" ");
 				if (i && (i % 8) == 0)
@@ -459,17 +462,21 @@ string LogHexDump(const unsigned char* data, size_t len)
 					result.append(" ");
 			}
 			char curByte = data[i];
-			if(curByte >= 32 && curByte <= 126) {
+			if(curByte >= 32 && curByte <= 126) 
+			{
 				// Printable char
 				result+=curByte;
 				printable = true;
-			} else {
+			} 
+			else 
+			{
 				sprintf(buffer,"%02X",(unsigned char)curByte);
 				result.append(buffer);
 				printable = false;
 			}
 		}
-		if(i == 31) {
+		if(i == 31) 
+		{
 			result+="... ";
 		}
 	}
