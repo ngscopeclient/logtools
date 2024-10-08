@@ -248,5 +248,7 @@ ATTR_FORMAT(2, 3) void Log(Severity severity, const char *format, ...);
 #undef ATTR_FORMAT
 #undef ATTR_NORETURN
 
+std::string LogHexDump(const unsigned char* data, size_t len);
+
 #endif
 
