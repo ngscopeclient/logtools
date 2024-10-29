@@ -350,48 +350,57 @@ void LogDebugTrace(const char* function, const char *format, ...)
 
 	string sfunc(function);
 
-	//Class and function names
-	string cls;
-	string name = sfunc;
+	//Strip off a "virtual " at the beginning, if present
+	size_t i = 0;
+	string vprefix = "virtual ";
+	if(sfunc.substr(0, vprefix.length()) == vprefix)
+		i = vprefix.length();
 
-	//Member function?
-	//Parse out "class::function" from PRETTY_FUNCTION which includes the return type and full arg list
-	//This normally gives us zillions of templates we dont need to see!
-	size_t poff = sfunc.rfind("(");
-	size_t colpos = sfunc.rfind("::", poff);
-	if( (colpos != string::npos) && (poff != string::npos))
+	//Everything before the next space is the return type... UNLESS we're a constructor
+	//in which case there's no return type
+	size_t ispace = sfunc.find(' ', i);
+	if(ispace == string::npos)
+		return;
+	string rtype = sfunc.substr(i, ispace-i);
+	bool isCtor = false;
+	if(rtype.find('(') != string::npos)
 	{
-		//Get the function name
-		size_t namelen = poff - colpos - 2;
-		name = sfunc.substr(colpos+2, namelen);
-
-		//Member function
-		size_t coff = name.find(" ");
-		if(coff == string::npos)
-		{
-			//Get the class name
-			size_t clen = colpos - coff - 1;
-			cls = sfunc.substr(coff + 1, clen);
-
-			//Remove any leading space-delimited values in the class name (return types etc)
-			coff = cls.rfind(" ");
-			cls = cls.substr(coff+1);
-		}
-
-		//Global function returning a namespaced type
-		else
-			name = name.substr(coff + 1);
+		isCtor = true;
+		rtype = "";
 	}
+	else
+		i += rtype.length() + 1;	//skip space after the return type
 
-	//Global function
+	//Extract class and function name
+	string cls = "";
+	string name = "";
+	size_t icolon = sfunc.find(':', i);
+	size_t iparen = sfunc.find('(', i);
+	if(iparen == string::npos)
+		return;
+	if(isCtor)
+	{
+		if(icolon == string::npos)
+			return;
+		cls = sfunc.substr(i, icolon-i);
+		name = cls;
+	}
 	else
 	{
-		size_t soff = sfunc.find(" ");
-		poff = sfunc.find("(", soff);
-		if( (soff != string::npos) && (poff != string::npos) )
+		//Not a constructor. Global or member function.
+
+		//If no colon, it's a global.
+		//If colon is after the parenthesis, we're a global taking a class type argument.
+		if( (icolon == string::npos) || (icolon > iparen) )
 		{
-			size_t namelen = poff - soff - 1;
-			name = sfunc.substr(soff+1, namelen);
+			cls = "";
+			name = sfunc.substr(i, iparen-i);
+		}
+
+		else
+		{
+			cls = sfunc.substr(i, icolon-i);
+			name = sfunc.substr(icolon+2, iparen-(icolon+2));
 		}
 	}
 
