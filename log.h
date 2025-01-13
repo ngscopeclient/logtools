@@ -46,6 +46,13 @@
 #undef ERROR
 #endif
 
+#if defined(_MSC_VER)
+// MSVC
+#include <thread>
+#undef ERROR
+#define __thread __declspec(thread)
+#endif
+
 /**
 	@brief		Severity of a logging message
 	@ingroup	liblog
