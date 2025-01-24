@@ -51,6 +51,11 @@
 #include <thread>
 #undef ERROR
 #define __thread __declspec(thread)
+#define EXPORT_SYMBOL __declspec(dllexport)
+#define IMPORT_SYMBOL _declspec(dllimport)
+#else
+#define EXPORT_SYMBOL
+#define IMPORT_SYMBOL
 #endif
 
 /**
@@ -84,7 +89,7 @@ extern __thread unsigned int g_logIndentLevel;
 	@brief		Base class for all log sinks
 	@ingroup	liblog
  */
-class LogSink
+class EXPORT_SYMBOL LogSink
 {
 public:
 	LogSink(Severity min_severity = Severity::VERBOSE)
@@ -135,7 +140,7 @@ protected:
 	@brief A log sink writing to stdout/stderr depending on severity
 	@ingroup	liblog
  */
-class STDLogSink : public LogSink
+class EXPORT_SYMBOL STDLogSink : public LogSink
 {
 public:
 	STDLogSink(Severity min_severity = Severity::VERBOSE);
@@ -152,7 +157,7 @@ protected:
 	@brief		A STDLogSink that colorizes "warning" or "error" keywords
 	@ingroup	liblog
  */
-class ColoredSTDLogSink : public STDLogSink
+class EXPORT_SYMBOL ColoredSTDLogSink : public STDLogSink
 {
 public:
 	ColoredSTDLogSink(Severity min_severity = Severity::VERBOSE);
@@ -171,7 +176,7 @@ protected:
 	@brief 		A log sink writing to a FILE* file handle
 	@ingroup	liblog
  */
-class FILELogSink : public LogSink
+class EXPORT_SYMBOL FILELogSink : public LogSink
 {
 public:
 	FILELogSink(FILE *f, bool line_buffered = false, Severity min_severity = Severity::VERBOSE);
@@ -184,9 +189,9 @@ protected:
 	FILE		*m_file;
 };
 
-extern std::mutex g_log_mutex;
-extern std::vector<std::unique_ptr<LogSink>> g_log_sinks;
-extern std::set<std::string> g_trace_filters;
+extern IMPORT_SYMBOL std::mutex g_log_mutex;
+extern IMPORT_SYMBOL std::vector<std::unique_ptr<LogSink>> g_log_sinks;
+extern IMPORT_SYMBOL std::set<std::string> g_trace_filters;
 
 /**
 	@brief		RAII wrapper for log indentation
@@ -194,7 +199,7 @@ extern std::set<std::string> g_trace_filters;
 
 	Log messages are indented once for each LogIndenter object in the call stack.
  */
-class LogIndenter
+class EXPORT_SYMBOL LogIndenter
 {
 public:
 	LogIndenter();
@@ -206,7 +211,7 @@ public:
 	@brief		Helper function for parsing arguments that use common syntax
 	@ingroup	liblog
  */
-bool ParseLoggerArguments(
+bool EXPORT_SYMBOL ParseLoggerArguments(
 	int& i,
 	int argc,
 	char* argv[],
@@ -245,16 +250,16 @@ bool ParseLoggerArguments(
 #define LogTrace(...) LogDebugTrace(__func__, __VA_ARGS__)
 #endif
 
-ATTR_FORMAT(1, 2) void LogVerbose(const char *format, ...);
-ATTR_FORMAT(1, 2) void LogNotice(const char *format, ...);
-ATTR_FORMAT(1, 2) void LogWarning(const char *format, ...);
-ATTR_FORMAT(1, 2) void LogError(const char *format, ...);
-ATTR_FORMAT(1, 2) void LogDebug(const char *format, ...);
-ATTR_FORMAT(2, 3) void LogDebugTrace(const char* function, const char *format, ...);
-ATTR_FORMAT(1, 2) ATTR_NORETURN void LogFatal(const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL void LogVerbose(const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL void LogNotice(const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL void LogWarning(const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL void LogError(const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL void LogDebug(const char *format, ...);
+ATTR_FORMAT(2, 3) EXPORT_SYMBOL void LogDebugTrace(const char *function, const char *format, ...);
+ATTR_FORMAT(1, 2) EXPORT_SYMBOL ATTR_NORETURN void LogFatal(const char *format, ...);
 
 ///Just print the message at given log level, don't do anything special for warnings or errors
-ATTR_FORMAT(2, 3) void Log(Severity severity, const char *format, ...);
+ATTR_FORMAT(2, 3) EXPORT_SYMBOL void Log(Severity severity, const char *format, ...);
 
 #undef ATTR_FORMAT
 #undef ATTR_NORETURN
