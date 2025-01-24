@@ -219,11 +219,15 @@ bool ParseLoggerArguments(
 #else
 #define ATTR_FORMAT(n, m) __attribute__((__format__ (__printf__, n, m)))
 #endif
+#define ATTR_NORETURN_PRE
 #define ATTR_NORETURN     __attribute__((noreturn))
 #else
-//FIXME on MSVC/Windows
+#if _MSC_VER
+// FIXME - doesn't seem to be any equivalent to __attribute__((__format__())) in MSVC
 #define ATTR_FORMAT(n, m)
+#define ATTR_NORETURN_PRE __declspec(noreturn)
 #define ATTR_NORETURN
+#endif
 #endif
 
 /**
