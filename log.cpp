@@ -441,3 +441,53 @@ void Log(Severity severity, const char *format, ...)
 		va_end(va);
 	}
 }
+
+/**
+ * @brief Convert a sequence of bytes to its textual representation ("hex dump").
+ *
+ * @param data Pointer to the byte sequence to print.
+ * @param len Number of bytes to print.
+ *
+ * @return string representation of the data buffer.
+ *
+ */
+string LogHexDump(const unsigned char* data, size_t len)
+{
+	string result;
+	size_t tailPos = len - 4;
+	char buffer[8];
+	bool printable = false;
+	for (size_t i = 0; i < len; i++) 
+	{
+		if(i<=31 || i >= tailPos) 
+		{
+			if(!printable) 
+			{
+				if (i)
+					result.append(" ");
+				if (i && (i % 8) == 0)
+					result.append(" ");
+				if (i && (i % 16) == 0)
+					result.append(" ");
+			}
+			char curByte = data[i];
+			if(curByte >= 32 && curByte <= 126) 
+			{
+				// Printable char
+				result+=curByte;
+				printable = true;
+			} 
+			else 
+			{
+				sprintf(buffer,"%02X",(unsigned char)curByte);
+				result.append(buffer);
+				printable = false;
+			}
+		}
+		if(i == 31) 
+		{
+			result+="... ";
+		}
+	}
+	return result;
+}
