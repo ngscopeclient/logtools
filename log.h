@@ -2,7 +2,7 @@
 *                                                                                                                      *
 * logtools                                                                                                             *
 *                                                                                                                      *
-* Copyright (c) 2016-2024 Andrew D. Zonenberg and contributors                                                         *
+* Copyright (c) 2016-2025 Andrew D. Zonenberg and contributors                                                         *
 * All rights reserved.                                                                                                 *
 *                                                                                                                      *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the     *
@@ -75,7 +75,10 @@ enum class Severity
 	VERBOSE	= 5,
 
 	///@brief Extremely detailed information only useful to people working on application internals
-	DEBUG = 6
+	DEBUG = 6,
+
+	///@brief Debug information that can be switched on/off on a per function basis
+	TRACE = 7
 };
 
 extern __thread unsigned int g_logIndentLevel;
@@ -99,6 +102,10 @@ public:
 	///@brief Returns the current severity / verbosity level
 	Severity GetSeverity()
 	{ return m_min_severity; }
+
+	///@brief Update the current severity level
+	void SetSeverity(Severity sev)
+	{ m_min_severity = sev; }
 
 	/**
 		@brief Gets the indent string (for now, only used by STDLogSink)

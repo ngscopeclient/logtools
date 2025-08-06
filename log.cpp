@@ -2,7 +2,7 @@
 *                                                                                                                      *
 * logtools                                                                                                             *
 *                                                                                                                      *
-* Copyright (c) 2016-2024 Andrew D. Zonenberg and contributors                                                         *
+* Copyright (c) 2016-2025 Andrew D. Zonenberg and contributors                                                         *
 * All rights reserved.                                                                                                 *
 *                                                                                                                      *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the     *
@@ -214,6 +214,8 @@ bool ParseLoggerArguments(
 	}
 	else if(s == "--trace")
 	{
+		console_verbosity = Severity::TRACE;
+
 		if(i+1 < argc)
 		{
 			string sfilter = argv[++i];
@@ -335,11 +337,11 @@ void LogDebugTrace(const char* function, const char *format, ...)
 {
 	lock_guard<mutex> lock(g_log_mutex);
 
-	//Early out (for performance) if we don't have any debug-level sinks
+	//Early out (for performance) if we don't have any trace-level sinks
 	bool has_debug_sinks = false;
 	for(auto &sink : g_log_sinks)
 	{
-		if(sink->GetSeverity() >= Severity::DEBUG)
+		if(sink->GetSeverity() >= Severity::TRACE)
 		{
 			has_debug_sinks = true;
 			break;
@@ -420,11 +422,11 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	for(auto &sink : g_log_sinks)
 	{
 		//First, print the function name prefix
-		sink->Log(Severity::DEBUG, string("[") + sfunc + "] " + sink->GetIndentString());
+		sink->Log(Severity::TRACE, string("[") + sfunc + "] " + sink->GetIndentString());
 
 		//then the message
 		va_start(va, format);
-		sink->Log(Severity::DEBUG, format, va);
+		sink->Log(Severity::TRACE, format, va);
 		va_end(va);
 	}
 }
