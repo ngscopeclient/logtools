@@ -481,7 +481,7 @@ string LogHexDump(const unsigned char* data, size_t len)
 			}
 			else
 			{
-				sprintf(buffer,"%02X",(unsigned char)curByte);
+				snprintf(buffer, sizeof(buffer), "%02X", (unsigned char)curByte);
 				result.append(buffer);
 				printable = false;
 			}
