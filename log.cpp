@@ -361,17 +361,20 @@ void LogDebugTrace(const char* function, const char *format, ...)
 	//Everything before the next space is the return type... UNLESS we're a constructor
 	//in which case there's no return type
 	size_t ispace = sfunc.find(' ', i);
-	if(ispace == string::npos)
-		return;
-	string rtype = sfunc.substr(i, ispace-i);
 	bool isCtor = false;
-	if(rtype.find('(') != string::npos)
-	{
+	if(ispace == string::npos)
 		isCtor = true;
-		rtype = "";
-	}
 	else
-		i += rtype.length() + 1;	//skip space after the return type
+	{
+		string rtype = sfunc.substr(i, ispace-i);
+		if(rtype.find('(') != string::npos)
+		{
+			isCtor = true;
+			rtype = "";
+		}
+		else
+			i += rtype.length() + 1;	//skip space after the return type
+	}
 
 	//Extract class and function name
 	string cls = "";
