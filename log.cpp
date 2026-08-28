@@ -44,7 +44,7 @@ using namespace std;
 	@brief		Mutex for serializing access to global logging state
 	@ingroup	logtools
  */
-mutex g_log_mutex;
+EXPORT_SYMBOL mutex g_log_mutex;
 
 /**
 	@brief		The current indentation level
@@ -59,21 +59,21 @@ __thread unsigned int g_logIndentLevel = 0;
 
 	@ingroup	logtools
  */
-vector<unique_ptr<LogSink>> g_log_sinks;
+EXPORT_SYMBOL vector<unique_ptr<LogSink>> g_log_sinks;
 
 /**
 	@brief		If set, STDLogSink will only write to stdout even for error/warning severity and never use stderr
 
 	@ingroup	logtools
  */
-bool g_logToStdoutAlways = false;
+EXPORT_SYMBOL bool g_logToStdoutAlways = false;
 
 /**
 	@brief		Set of classes or class::function for high verbosity trace messages
 
 	@ingroup	logtools
  */
-set<string> g_trace_filters;
+EXPORT_SYMBOL set<string> g_trace_filters;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // String formatting
